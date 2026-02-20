@@ -209,7 +209,7 @@ claude-academic-setup/
 │   ├── grant-writing/    # NEW
 │   ├── research-ideation/  # NEW
 │   ├── irb-protocol/     # NEW
-│   └── ... (38 more)
+│   └── ... (37 more)
 ├── agents/               # 32 agent files
 ├── commands/             # 6 command files
 └── hooks/                # 1 hook script

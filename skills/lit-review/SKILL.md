@@ -42,7 +42,7 @@ Use AskUserQuestion to clarify:
 
 ### Phase 2: Search Databases
 
-1. Search user's Zotero library first (using `zotero_search_items` or `zotero_semantic_search`)
+1. Search user's Zotero library first (using Zotero MCP search tools — exact tool names depend on installed server)
 2. Search external databases via paper-search-mcp
 3. Deduplicate results across sources
 4. Present initial hit counts by database
@@ -59,7 +59,7 @@ Use AskUserQuestion to clarify:
 
 ### Phase 4: Extract and Synthesize
 
-1. For included papers, retrieve full text where available (via `zotero_get_item_fulltext`)
+1. For included papers, retrieve full text where available (via Zotero MCP fulltext tools)
 2. Extract key findings into an evidence table:
 
 | Author (Year) | Study Design | Sample | Key Finding | Relevance |
