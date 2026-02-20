@@ -1,0 +1,162 @@
+{
+  "env": {
+    "USE_BUILTIN_RIPGREP": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(npm run build)",
+      "Bash(npm run test:*)",
+      "Bash(npm run lint)",
+      "Bash(npm install)",
+      "Bash(npm ci)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(yarn *)",
+      "Bash(pnpm *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git show *)",
+      "Bash(git stash list)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git pull *)",
+      "Bash(git push)",
+      "Bash(git push origin *)",
+      "Bash(ls *)",
+      "Bash(pwd)",
+      "Bash(which *)",
+      "Bash(echo *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(Rscript *)",
+      "Bash(R CMD *)",
+      "Bash(renv::*)",
+      "Bash(stata *)",
+      "Bash(stata-mp *)",
+      "Bash(snakemake *)",
+      "Bash(docker build *)",
+      "Bash(docker run *)",
+      "Bash(docker compose *)",
+      "Bash(docker ps *)",
+      "Bash(docker images *)",
+      "Bash(docker logs *)",
+      "Bash(make *)",
+      "Bash(quarto *)",
+      "Bash(pandoc *)",
+      "Bash(latexmk *)",
+      "Bash(open *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:npmjs.com)",
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:developer.mozilla.org)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:api.crossref.org)",
+      "WebFetch(domain:scholar.google.com)"
+    ],
+    "deny": [
+      "Read(**/.ssh/*)",
+      "Read(**/.aws/*)",
+      "Read(**/.gnupg/*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*credentials*)",
+      "Read(**/*secret*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Edit(**/.ssh/*)",
+      "Edit(**/.aws/*)",
+      "Edit(**/.gnupg/*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Edit(**/*credentials*)",
+      "Edit(**/*secret*)",
+      "Write(**/.ssh/*)",
+      "Write(**/.aws/*)",
+      "Write(**/.gnupg/*)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Write(**/*credentials*)",
+      "Write(**/*secret*)",
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~ *)",
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(fdisk *)",
+      "Bash(shutdown *)",
+      "Bash(reboot *)",
+      "Bash(chmod 777 *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(docker rm -f *)",
+      "Bash(docker system prune *)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/check-docs-update.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path'); if echo \"$f\" | grep -qE '\\.json$'; then python3 -c \"import json; json.load(open('$f'))\" 2>&1 || true; elif echo \"$f\" | grep -qE '\\.R$'; then R --no-save --no-restore -e \"parse('$f')\" 2>&1 | tail -3 || true; elif echo \"$f\" | grep -qE '\\.ya?ml$'; then python3 -c \"import yaml; yaml.safe_load(open('$f'))\" 2>&1 || true; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "code-simplifier@claude-plugins-official": true,
+    "claude-notifications-go@claude-notifications-go": true,
+    "superpowers@obra": true,
+    "clangd-lsp@claude-plugins-official": true,
+    "plannotator@plannotator": true,
+    "context7@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "figma@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true
+  },
+  "alwaysThinkingEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "mcpServers": {}
+}
