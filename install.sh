@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "=== Claude Code + Cursor Academic Researcher Setup ==="
+echo "=== Claude Code + Cursor Academic Researcher Setup (Core) ==="
 echo ""
 
 # Colors
@@ -85,57 +85,29 @@ fi
 
 echo ""
 
-# ---------- 2. Cursor Extensions ----------
-echo "2. Installing Cursor extensions..."
+# ---------- 2. Cursor Extensions (Core Only) ----------
+echo "2. Installing core Cursor extensions..."
 
-# Core extensions verified on Open VSX
-EXTENSIONS=(
+CORE_EXTENSIONS=(
   anthropic.claude-code
-  google.gemini-cli-vscode-ide-companion
-  openai.chatgpt
   shd101wyy.markdown-preview-enhanced
   bierner.markdown-mermaid
-  hediet.vscode-drawio
   mechatroner.rainbow-csv
   grapecity.gc-excelviewer
   redhat.vscode-yaml
-  eamodio.gitlens
   streetsidesoftware.code-spell-checker
-  usernamehw.errorlens
-  oderwat.indent-rainbow
-  alefragnani.project-manager
   pkief.material-icon-theme
-)
-
-# Academic extensions (Open VSX — verify at install time)
-ACADEMIC_EXTENSIONS=(
   james-yu.latex-workshop
   ltex-plus.vscode-ltex-plus
   quarto.quarto
   REditorSupport.r
-)
-
-# Optional extensions (may need manual VSIX install)
-OPTIONAL_EXTENSIONS=(
   ms-python.python
   ms-toolsai.jupyter
-  DeepEcon.stata-mcp
 )
 
 if [ "$HAS_CURSOR" -eq 1 ]; then
-  echo "   Core extensions..."
-  for ext in "${EXTENSIONS[@]}"; do
+  for ext in "${CORE_EXTENSIONS[@]}"; do
     cursor --install-extension "$ext" 2>/dev/null && ok "$ext" || warn "Failed: $ext"
-  done
-  echo ""
-  echo "   Academic extensions..."
-  for ext in "${ACADEMIC_EXTENSIONS[@]}"; do
-    cursor --install-extension "$ext" 2>/dev/null && ok "$ext" || warn "Failed: $ext — may need manual install"
-  done
-  echo ""
-  echo "   Optional extensions (may need manual VSIX install)..."
-  for ext in "${OPTIONAL_EXTENSIONS[@]}"; do
-    cursor --install-extension "$ext" 2>/dev/null && ok "$ext" || warn "Failed: $ext — install manually from VSIX"
   done
 else
   warn "Skipping extensions — cursor not in PATH"
@@ -155,7 +127,7 @@ fi
 
 BACKUP_DIR=~/.claude/backup.$(date +%Y%m%d%H%M%S)
 NEED_BACKUP=0
-for check_dir in ~/.claude/skills ~/.claude/agents ~/.claude/commands ~/.claude/hooks; do
+for check_dir in ~/.claude/skills ~/.claude/commands ~/.claude/hooks; do
   [ -d "$check_dir" ] && NEED_BACKUP=1
 done
 [ -f ~/.claude/CLAUDE.md ] && NEED_BACKUP=1
@@ -163,7 +135,6 @@ done
 if [ "$NEED_BACKUP" -eq 1 ]; then
   mkdir -p "$BACKUP_DIR"
   [ -d ~/.claude/skills ] && cp -r ~/.claude/skills "$BACKUP_DIR/"
-  [ -d ~/.claude/agents ] && cp -r ~/.claude/agents "$BACKUP_DIR/"
   [ -d ~/.claude/commands ] && cp -r ~/.claude/commands "$BACKUP_DIR/"
   [ -d ~/.claude/hooks ] && cp -r ~/.claude/hooks "$BACKUP_DIR/"
   [ -f ~/.claude/CLAUDE.md ] && cp ~/.claude/CLAUDE.md "$BACKUP_DIR/"
@@ -172,36 +143,46 @@ fi
 echo ""
 
 # ---------- 4. Settings ----------
-echo "4. Copying settings.json..."
+echo "4. Copying settings.json (safe defaults)..."
 
 cp "$SCRIPT_DIR/settings.json" ~/.claude/settings.json
-ok "settings.json installed"
+ok "settings.json installed (14 plugins, acceptEdits mode)"
 echo ""
 
-# ---------- 5. Skills ----------
-echo "5. Copying skills (43)..."
+# ---------- 5. Core Skills ----------
+echo "5. Copying core skills (13)..."
+
+CORE_SKILLS=(
+  napkin
+  catch-up
+  codex
+  gemini
+  discuss-claims
+  skill-creator
+  screenshot
+  playwright
+  pdf
+  doc
+  lit-review
+  brainstorming
+  datacheck
+)
 
 mkdir -p ~/.claude/skills
-for skill_dir in "$SCRIPT_DIR"/skills/*/; do
-  skill_name=$(basename "$skill_dir")
-  mkdir -p ~/.claude/skills/"$skill_name"
-  cp -r "$skill_dir"* ~/.claude/skills/"$skill_name"/
-  ok "$skill_name"
+for skill_name in "${CORE_SKILLS[@]}"; do
+  skill_dir="$SCRIPT_DIR/skills/$skill_name"
+  if [ -d "$skill_dir" ]; then
+    mkdir -p ~/.claude/skills/"$skill_name"
+    cp -r "$skill_dir"/* ~/.claude/skills/"$skill_name"/
+    ok "$skill_name"
+  else
+    warn "$skill_name not found in repo — skipping"
+  fi
 done
 echo ""
 
-# ---------- 6. Agents ----------
-echo "6. Copying agents (32)..."
-
-mkdir -p ~/.claude/agents
-for agent in "$SCRIPT_DIR"/agents/*.md; do
-  cp "$agent" ~/.claude/agents/
-  ok "$(basename "$agent")"
-done
-echo ""
-
-# ---------- 7. Commands ----------
-echo "7. Copying commands (6)..."
+# ---------- 6. Commands ----------
+echo "6. Copying commands (7)..."
 
 mkdir -p ~/.claude/commands
 for cmd_file in "$SCRIPT_DIR"/commands/*.md; do
@@ -210,8 +191,8 @@ for cmd_file in "$SCRIPT_DIR"/commands/*.md; do
 done
 echo ""
 
-# ---------- 8. Hooks ----------
-echo "8. Copying hooks..."
+# ---------- 7. Hooks ----------
+echo "7. Copying hooks..."
 
 mkdir -p ~/.claude/hooks
 cp "$SCRIPT_DIR/hooks/check-docs-update.sh" ~/.claude/hooks/
@@ -219,15 +200,15 @@ chmod +x ~/.claude/hooks/check-docs-update.sh
 ok "check-docs-update.sh (executable)"
 echo ""
 
-# ---------- 9. CLAUDE.md ----------
-echo "9. Copying CLAUDE.md..."
+# ---------- 8. CLAUDE.md ----------
+echo "8. Copying CLAUDE.md..."
 
 cp "$SCRIPT_DIR/CLAUDE.md" ~/.claude/CLAUDE.md
 ok "CLAUDE.md installed"
 echo ""
 
-# ---------- 10. Multi-AI & packages ----------
-echo "10. Installing multi-AI tools and packages..."
+# ---------- 9. Multi-AI & packages ----------
+echo "9. Installing multi-AI tools and packages..."
 
 # Gemini CLI
 if command -v gemini > /dev/null 2>&1; then
@@ -269,8 +250,8 @@ fi
 
 echo ""
 
-# ---------- 11. MCP Servers ----------
-echo "11. MCP server setup..."
+# ---------- 10. MCP Servers ----------
+echo "10. MCP server setup..."
 
 echo "   paper-search-mcp can be added to your MCP config."
 echo "   Add to ~/.claude/settings.json mcpServers or use:"
@@ -281,84 +262,81 @@ echo "   See: https://github.com/kujenga/zotero-mcp for setup instructions."
 ok "MCP server instructions printed"
 echo ""
 
-# ---------- 12. Plugins reminder ----------
-echo "12. Plugin installation (manual step)"
+# ---------- 11. Plugin Installation ----------
+echo "11. Plugin installation (manual step)"
 echo ""
 echo "   Open Claude Code CLI and run these commands:"
 echo ""
-echo "   /install code-simplifier@claude-plugins-official"
-echo "   /install claude-notifications-go@claude-notifications-go"
 echo "   /install superpowers@obra"
-echo "   /install clangd-lsp@claude-plugins-official"
 echo "   /install plannotator@plannotator"
-echo "   /install context7@claude-plugins-official"
-echo "   /install code-review@claude-plugins-official"
-echo "   /install github@claude-plugins-official"
-echo "   /install feature-dev@claude-plugins-official"
+echo "   /install claude-notifications-go@claude-notifications-go"
 echo "   /install ralph-loop@claude-plugins-official"
 echo "   /install playwright@claude-plugins-official"
+echo "   /install code-review@claude-plugins-official"
+echo "   /install github@claude-plugins-official"
+echo "   /install context7@claude-plugins-official"
+echo "   /install feature-dev@claude-plugins-official"
+echo "   /install code-simplifier@claude-plugins-official"
 echo "   /install commit-commands@claude-plugins-official"
-echo "   /install pyright-lsp@claude-plugins-official"
-echo "   /install figma@claude-plugins-official"
 echo "   /install plugin-dev@claude-plugins-official"
-echo "   /install frontend-design@claude-code-plugins"
+echo "   /install clangd-lsp@claude-plugins-official"
+echo "   /install pyright-lsp@claude-plugins-official"
 echo ""
 
-# ---------- 13. Verification ----------
+# ---------- 12. Verification ----------
 echo "=== Verification ==="
 echo ""
 
 if [ "$HAS_CURSOR" -eq 1 ]; then
   EXT_COUNT=$(cursor --list-extensions 2>/dev/null | wc -l | tr -d ' ')
-  echo "1. Cursor extensions: $EXT_COUNT (expected: >= 15 core + 4 academic)"
+  echo "1. Cursor extensions: $EXT_COUNT (expected: >= 14 core)"
 else
   echo "1. Cursor extensions: SKIPPED (cursor not in PATH)"
 fi
 
 if python3 -c "import json; json.load(open('$HOME/.claude/settings.json'))" 2>/dev/null; then
   PLUGIN_COUNT=$(python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))")
-  echo "2. Settings.json: valid, $PLUGIN_COUNT plugins (expected: 16)"
+  echo "2. Settings.json: valid, $PLUGIN_COUNT plugins (expected: 14)"
 else
   echo "2. Settings.json: INVALID or missing"
 fi
 
-echo "3. Skills: $(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ') (expected: >= 43)"
-echo "4. Agents: $(ls ~/.claude/agents/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 32)"
-echo "5. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 6)"
+echo "3. Skills: $(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ') (expected: >= 13 core)"
+echo "4. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 7)"
 
 test -x ~/.claude/hooks/check-docs-update.sh \
-  && echo "6. Hook: executable" \
-  || echo "6. Hook: MISSING"
+  && echo "5. Hook: executable" \
+  || echo "5. Hook: MISSING"
 
 test -f ~/.claude/CLAUDE.md \
-  && echo "7. CLAUDE.md: present" \
-  || echo "7. CLAUDE.md: MISSING"
+  && echo "6. CLAUDE.md: present" \
+  || echo "6. CLAUDE.md: MISSING"
 
 command -v gemini > /dev/null 2>&1 \
-  && echo "8. Gemini CLI: installed" \
-  || echo "8. Gemini CLI: NOT INSTALLED"
+  && echo "7. Gemini CLI: installed" \
+  || echo "7. Gemini CLI: NOT INSTALLED"
 
 command -v codex > /dev/null 2>&1 \
-  && echo "9. Codex CLI: installed" \
-  || echo "9. Codex CLI: NOT INSTALLED"
+  && echo "8. Codex CLI: installed" \
+  || echo "8. Codex CLI: NOT INSTALLED"
 
 python3 -c "import plotnine; import plotly; import statsmodels" 2>/dev/null \
-  && echo "10. Python packages: OK" \
-  || echo "10. Python packages: SOME MISSING"
+  && echo "9. Python packages: OK" \
+  || echo "9. Python packages: SOME MISSING"
 
 if [ "$HAS_R" -eq 1 ]; then
   R_STATUS=$(Rscript -e "cat(ifelse(all(c('survey','tidyverse','marginaleffects') %in% installed.packages()[,'Package']), 'OK', 'SOME MISSING'))" 2>/dev/null || echo "CHECK FAILED")
-  echo "11. R packages: $R_STATUS"
+  echo "10. R packages: $R_STATUS"
 else
-  echo "11. R packages: SKIPPED (R not found)"
+  echo "10. R packages: SKIPPED (R not found)"
 fi
 
 echo ""
-echo "=== Setup complete ==="
+echo "=== Core setup complete ==="
 echo ""
 echo "Next steps:"
-echo "  1. Install plugins (step 12 above) inside Claude Code CLI"
+echo "  1. Install plugins (step 11 above) inside Claude Code CLI"
 echo "  2. Authenticate Gemini: run 'gemini' and sign in"
 echo "  3. Authenticate Codex: run 'codex' and sign in"
-echo "  4. Set up Zotero MCP (see step 11 above)"
-echo "  5. Try: /lit-search [topic], /zotero-review [collection], /page"
+echo "  4. Set up Zotero MCP (see step 10 above)"
+echo "  5. For optional skills (30 more) and extensions: bash install-optional.sh"
