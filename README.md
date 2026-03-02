@@ -69,21 +69,21 @@ Claude works like a research assistant through the agentic loop: reads your data
 
 ### Phase 3: Validation & Interpretation
 
-After analysis, use `/discuss-claims` to create GitHub issues for structured review of your empirical claims. This is useful for collaborators who can comment directly on specific findings.
-
-Ask Claude to produce a review document covering motivation, method, results, interpretation, limitations, and next steps. This creates a record of what was done and why, and helps you catch issues before they become problems.
+After analysis, ask Claude to produce a review document covering motivation, method, results, interpretation, limitations, and next steps. This creates a record of what was done and why, and helps you catch issues before they become problems.
 
 You can ask Claude for detailed explanations of any part of the analysis — walk through the model specification, explain coefficient interpretations, or justify methodological choices. This works interactively: ask follow-up questions, request alternative explanations, or have Claude trace through what it actually did step by step.
 
 Build validation skills with `/skill-creator` for checks you run repeatedly (e.g., specific diagnostic tests, robustness check sequences).
 
-### Phase 4: Audit Trail & Reproducibility
+You can use `/discuss-claims` to create GitHub issues for structured review of your empirical claims. This is useful for collaborators who can comment directly on specific findings.
 
-Use `/updates-git` after each analysis step — it commits changes and updates documentation (README, CLAUDE.md, napkin) in one pass. This creates a granular audit trail that meets open science requirements.
+### Phase 4: Audit Trail & Reproducibility
 
 The `/napkin` skill automatically tracks per-project learnings: mistakes made, corrections applied, patterns that work. This accumulates institutional knowledge within each project.
 
 Keep CLAUDE.md and README updated — this is how Claude (and you) remembers what has been done and what comes next. If you repeat something three or more times, turn it into a skill with `/skill-creator`.
+
+If you use git, use `/updates-git` after each analysis step — it commits changes and updates documentation (README, CLAUDE.md, napkin) in one pass. This creates a granular audit trail that meets open science requirements.
 
 ### Phase 5: Project Management & Sustainability
 
@@ -107,6 +107,49 @@ Monitor token usage with [ccusage](https://github.com/ryoppippi/ccusage) CLI or 
 - **Plans are saved automatically.** All plans and conversations are stored locally under `~/.claude/plans` — they're always recoverable. You can also document plans in your project folder.
 - **Use GitHub issues for collaboration.** Ask Claude to create issues summarizing completed work so collaborators can comment and review.
 - **Create skills for repeated work.** If you do something more than twice, use `/skill-creator` to codify it. Use skills to reference the same resources (packages, databases) consistently.
+
+---
+
+## Useful Commands
+
+Commands you'll use daily. Full reference: [CC101](https://cc101.axwith.com) (toggle to EN).
+
+### Terminal (before starting Claude)
+
+| Command | What it does |
+|---------|--------------|
+| `claude` | Start interactive session in current directory |
+| `claude -c` | Continue your last session (preserves full context) |
+| `claude --resume` | Resume a named session — use with `/rename` to bookmark important sessions |
+| `claude "do X"` | One-shot: ask a question and exit |
+| `claude doctor` | Check installation health (plugins, permissions, hooks) |
+| `claude update` | Update Claude Code to latest version |
+
+### Inside a Session
+
+| Command | What it does |
+|---------|--------------|
+| `/init` | Generate a CLAUDE.md for the current project — essential first step in any new repo |
+| `/compact` | Compress conversation history to reclaim context window. Use when Claude starts forgetting things or after long debugging sessions |
+| `/clear` | Full context reset. Use when switching to an unrelated topic |
+| `/model` | Switch between Sonnet (fast, cheap), Opus (deep reasoning), Haiku (simple tasks) |
+| `/memory` | Open and edit the project's CLAUDE.md directly |
+| `/context` | Show how much of the context window is used — helps you decide when to `/compact` |
+| `/plan` | Enter Plan Mode (same as `Shift+Tab`). Claude plans without executing |
+| `/rename [name]` | Label the current session for easy `/resume` later |
+| `/permissions` | View and manage what Claude can do (read, write, execute) |
+| `/plugin` | Manage installed plugins |
+| `/mcp` | Manage MCP server connections |
+
+### Keyboard Shortcuts
+
+| Shortcut | What it does |
+|----------|--------------|
+| `Shift+Tab` | Toggle Plan Mode — Claude plans without executing. Essential before complex tasks |
+| `Esc Esc` | Rewind to the previous state — undo Claude's last action |
+| `Shift+Enter` | Line break in your input (for multi-line prompts) |
+| `Ctrl+C` | Cancel the current task |
+| `Ctrl+D` | Exit Claude Code |
 
 ---
 
