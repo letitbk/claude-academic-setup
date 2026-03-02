@@ -10,7 +10,7 @@ AI-powered research workstation for social scientists using R, Stata, and Python
 
 | Tool | Install |
 |------|---------|
-| Claude Code CLI | `npm install -g @anthropic-ai/claude-code` |
+| Claude Code CLI | `curl -fsSL https://claude.ai/install.sh | bash` |
 | Node.js 18+ | https://nodejs.org/ |
 | Python 3.10+ | https://www.python.org/ |
 | jq | `brew install jq` |
