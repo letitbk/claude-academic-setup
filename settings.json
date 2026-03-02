@@ -111,7 +111,7 @@
       "Bash(docker rm -f *)",
       "Bash(docker system prune *)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
     "Stop": [
@@ -142,7 +142,6 @@
     "code-simplifier@claude-plugins-official": true,
     "claude-notifications-go@claude-notifications-go": true,
     "superpowers@obra": true,
-    "clangd-lsp@claude-plugins-official": true,
     "plannotator@plannotator": true,
     "context7@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,

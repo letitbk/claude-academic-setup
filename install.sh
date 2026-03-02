@@ -146,7 +146,7 @@ echo ""
 echo "4. Copying settings.json (permissive defaults)..."
 
 cp "$SCRIPT_DIR/settings.json" ~/.claude/settings.json
-ok "settings.json installed (14 plugins, permissive mode — dangerous ops still blocked)"
+ok "settings.json installed (13 plugins, bypassPermissions mode — dangerous ops still blocked)"
 echo ""
 
 # ---------- 5. Core Skills ----------
@@ -279,7 +279,6 @@ echo "   /install feature-dev@claude-plugins-official"
 echo "   /install code-simplifier@claude-plugins-official"
 echo "   /install commit-commands@claude-plugins-official"
 echo "   /install plugin-dev@claude-plugins-official"
-echo "   /install clangd-lsp@claude-plugins-official"
 echo "   /install pyright-lsp@claude-plugins-official"
 echo ""
 
@@ -296,7 +295,7 @@ fi
 
 if python3 -c "import json; json.load(open('$HOME/.claude/settings.json'))" 2>/dev/null; then
   PLUGIN_COUNT=$(python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))")
-  echo "2. Settings.json: valid, $PLUGIN_COUNT plugins (expected: 14)"
+  echo "2. Settings.json: valid, $PLUGIN_COUNT plugins (expected: 13)"
 else
   echo "2. Settings.json: INVALID or missing"
 fi
