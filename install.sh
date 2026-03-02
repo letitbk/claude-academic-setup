@@ -143,10 +143,10 @@ fi
 echo ""
 
 # ---------- 4. Settings ----------
-echo "4. Copying settings.json (safe defaults)..."
+echo "4. Copying settings.json (permissive defaults)..."
 
 cp "$SCRIPT_DIR/settings.json" ~/.claude/settings.json
-ok "settings.json installed (14 plugins, acceptEdits mode)"
+ok "settings.json installed (14 plugins, permissive mode — dangerous ops still blocked)"
 echo ""
 
 # ---------- 5. Core Skills ----------

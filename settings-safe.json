@@ -1,5 +1,4 @@
 {
-  "_WARNING": "This config skips permission prompts. Use only when you understand the risks and trust the task.",
   "env": {
     "USE_BUILTIN_RIPGREP": "1"
   },
@@ -156,6 +155,6 @@
     "plugin-dev@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
+  "skipDangerousModePermissionPrompt": false,
   "mcpServers": {}
 }

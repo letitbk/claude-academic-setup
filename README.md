@@ -25,7 +25,9 @@ cd claude-academic-setup
 bash install.sh
 ```
 
-This installs 13 core skills, 7 slash commands, 1 hook, safe-default settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (30 additional skills + 8 more extensions), run `bash install-optional.sh` after.
+This installs 13 core skills, 7 slash commands, 1 hook, permissive-default settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (30 additional skills + 8 more extensions), run `bash install-optional.sh` after.
+
+> **Security note:** The default settings skip the startup warning dialog so Claude works without interruption. Pre-approved commands (git, Python, R, Stata, etc.) run automatically; dangerous operations (SSH keys, credentials, `sudo`, `rm -rf /`, force push) are blocked. If you want a confirmation dialog at each session start, copy the safe settings: `cp settings-safe.json ~/.claude/settings.json`
 
 ---
 
@@ -37,7 +39,7 @@ Claude Code is not a chatbot. It is an autonomous agent that runs in your termin
 
 **CLAUDE.md is your lab notebook.** Claude's context window is working memory — it resets every session. CLAUDE.md is persistent memory that Claude reads at the start of every session. Put your project description, analysis pipeline status, conventions, and key decisions here. This is how Claude remembers what happened last week.
 
-**Skills, plugins, and permissions.** Skills are saved workflows that you invoke with `/skill-name` — they encode expertise so Claude knows how to run a survey analysis or review literature. Plugins add capabilities (GitHub integration, browser automation, notifications). Permissions are guardrails — the default config lets Claude edit files freely but asks before running shell commands.
+**Skills, plugins, and permissions.** Skills are saved workflows that you invoke with `/skill-name` — they encode expertise so Claude knows how to run a survey analysis or review literature. Plugins add capabilities (GitHub integration, browser automation, notifications). Permissions are guardrails — the default config lets Claude edit files and run pre-approved commands (git, Python, R, Stata) automatically, while blocking dangerous operations.
 
 **Hooks** are event-driven automation — they run automatically when certain things happen. The included hook checks whether documentation needs updating when Claude finishes a task. Hooks can also send desktop notifications or validate file syntax after edits.
 
@@ -59,7 +61,7 @@ Review plans with `/codex` or `/gemini` for independent second opinions from GPT
 
 ### Phase 2: Execution & Data Wrangling
 
-Use ralph-loop for autonomous iteration — Claude works through your analysis step by step until completion. The default configuration uses safe permissions (acceptEdits mode): Claude edits files freely but asks before running shell commands. For fully autonomous workflows, see [permissive mode](docs/advanced-config.md).
+Use ralph-loop for autonomous iteration — Claude works through your analysis step by step until completion. The default configuration uses permissive permissions — Claude executes pre-approved commands without asking. Dangerous operations are still blocked (see [security details](docs/advanced-config.md)). For a more cautious mode where Claude asks before each command, copy `settings-safe.json` to `~/.claude/settings.json`.
 
 Claude works like a research assistant through the agentic loop: reads your data, writes analysis code, runs it, checks diagnostics, and fixes issues — all without you intervening at each step.
 
@@ -68,6 +70,8 @@ Claude works like a research assistant through the agentic loop: reads your data
 After analysis, use `/discuss-claims` to create GitHub issues for structured review of your empirical claims. This is useful for collaborators who can comment directly on specific findings.
 
 Ask Claude to produce a review document covering motivation, method, results, interpretation, limitations, and next steps. This creates a record of what was done and why, and helps you catch issues before they become problems.
+
+You can ask Claude for detailed explanations of any part of the analysis — walk through the model specification, explain coefficient interpretations, or justify methodological choices. This works interactively: ask follow-up questions, request alternative explanations, or have Claude trace through what it actually did step by step.
 
 Build validation skills with `/skill-creator` for checks you run repeatedly (e.g., specific diagnostic tests, robustness check sequences).
 
@@ -93,11 +97,12 @@ Monitor token usage with [ccusage](https://github.com/ryoppippi/ccusage) CLI or 
 
 ## Tips & Lessons Learned
 
+- **Plan as much as possible.** Use Plan Mode (`Shift+Tab`) before any non-trivial task. Have Claude outline its approach, review it with `/codex` or `/gemini`, and revise until you're satisfied. Planning is cheap; re-doing analysis is expensive.
 - **Specify WHAT and WHY, not HOW.** Let Claude figure out the implementation. If you have ideas about methods, share them as context, but also ask Claude to explore alternatives.
 - **Ask Claude to ask you questions back.** The AskUserQuestion pattern produces better results than writing a long prompt upfront.
 - **Context is working memory.** Irrelevant context (failed attempts, old errors) degrades performance. Use `/compact` regularly. Start new sessions for unrelated work.
 - **Start without custom subagents.** Claude's built-in Task tool handles most multi-step work. Add specific agents only when you hit limitations.
-- **Plans are saved automatically.** All plans and conversations are stored locally under `~/.claude/` — they're always recoverable. You can also document plans in your project folder.
+- **Plans are saved automatically.** All plans and conversations are stored locally under `~/.claude/plans` — they're always recoverable. You can also document plans in your project folder.
 - **Use GitHub issues for collaboration.** Ask Claude to create issues summarizing completed work so collaborators can comment and review.
 - **Create skills for repeated work.** If you do something more than twice, use `/skill-creator` to codify it. Use skills to reference the same resources (packages, databases) consistently.
 
@@ -128,12 +133,12 @@ Open Claude Code and run each command:
 
 ### 2. Connect Your Literature Tools
 
-**Zotero MCP** (for literature management — highly recommended for social scientists):
+[**Zotero MCP**](https://github.com/54yyyu/zotero-mcp) (for literature management — highly recommended for social scientists):
 - Install Zotero desktop app and keep it running
 - Get API key from https://www.zotero.org/settings/keys
 - See [docs/advanced-config.md](docs/advanced-config.md) for full setup
 
-**paper-search-mcp** (for PubMed/arXiv/Semantic Scholar):
+[**paper-search-mcp**](https://github.com/openags/paper-search-mcp) (for PubMed/arXiv/Semantic Scholar):
 - Add to mcpServers config or run via `npx -y paper-search-mcp`
 
 ### 3. Authenticate AI Review Tools
@@ -169,20 +174,20 @@ codex    # Sign in with OpenAI account
 
 | Plugin | Analytic Value |
 |--------|----------------|
-| `superpowers` | Extended Claude capabilities for complex multi-step tasks |
-| `plannotator` | Interactive plan annotation and structured review |
-| `claude-notifications-go` | Desktop alerts when Claude finishes or needs input |
-| `ralph-loop` | Autonomous task iteration through the full agentic loop |
-| `playwright` | Browser automation from within Claude sessions |
-| `code-review` | Structured code review with actionable feedback |
-| `github` | Git/GitHub integration for issues, PRs, and collaboration |
-| `context7` | Up-to-date library documentation lookup during coding |
-| `feature-dev` | Guided feature development with codebase understanding |
-| `code-simplifier` | Reduce code complexity while preserving functionality |
-| `commit-commands` | Streamlined git commit, push, and PR workflows |
-| `plugin-dev` | Create and manage custom plugins |
-| `clangd-lsp` | C/C++ language server for compiled code analysis |
-| `pyright-lsp` | Python type checking and IntelliSense |
+| [`superpowers`](https://github.com/obra/superpowers) | Extended Claude capabilities for complex multi-step tasks |
+| [`plannotator`](https://github.com/backnotprop/plannotator) | Interactive plan annotation and structured review |
+| [`claude-notifications-go`](https://github.com/777genius/claude-notifications-go) | Desktop alerts when Claude finishes or needs input |
+| [`ralph-loop`](https://github.com/anthropics/claude-plugins-official) | Autonomous task iteration through the full agentic loop |
+| [`playwright`](https://github.com/anthropics/claude-plugins-official) | Browser automation from within Claude sessions |
+| [`code-review`](https://github.com/anthropics/claude-plugins-official) | Structured code review with actionable feedback |
+| [`github`](https://github.com/anthropics/claude-plugins-official) | Git/GitHub integration for issues, PRs, and collaboration |
+| [`context7`](https://github.com/upstash/context7) | Up-to-date library documentation lookup during coding |
+| [`feature-dev`](https://github.com/anthropics/claude-plugins-official) | Guided feature development with codebase understanding |
+| [`code-simplifier`](https://github.com/anthropics/claude-plugins-official) | Reduce code complexity while preserving functionality |
+| [`commit-commands`](https://github.com/anthropics/claude-plugins-official) | Streamlined git commit, push, and PR workflows |
+| [`plugin-dev`](https://github.com/anthropics/claude-plugins-official) | Create and manage custom plugins |
+| [`clangd-lsp`](https://github.com/anthropics/claude-plugins-official) | C/C++ language server for compiled code analysis |
+| [`pyright-lsp`](https://github.com/anthropics/claude-plugins-official) | Python type checking and IntelliSense |
 
 ---
 
@@ -197,7 +202,7 @@ bash install-optional.sh
 See:
 - [Optional Skills](docs/optional-skills.md) — 30 domain-specific skills organized by category
 - [Cursor Extensions](docs/cursor-extensions.md) — all 22 extensions with safety and usefulness info
-- [Advanced Configuration](docs/advanced-config.md) — permissive mode, MCP servers, settings deep dive
+- [Advanced Configuration](docs/advanced-config.md) — safe mode, MCP servers, settings deep dive
 
 ---
 
@@ -221,8 +226,8 @@ claude-academic-setup/
 ├── CLAUDE.md                    # AI behavioral guidelines
 ├── install.sh                   # Core install (13 skills, 14 extensions)
 ├── install-optional.sh          # Optional add-ons (30 skills, 8 extensions)
-├── settings.json                # Safe-default Claude Code settings
-├── settings-permissive.json     # Permissive mode (skips permission prompts)
+├── settings.json                # Permissive-default Claude Code settings
+├── settings-safe.json           # Safe mode (asks before shell commands)
 ├── docs/
 │   ├── optional-skills.md       # 30 optional skills reference
 │   ├── cursor-extensions.md     # All extensions with safety info

@@ -1,46 +1,47 @@
 # Advanced Configuration
 
-This guide covers configuration beyond the default install: permissive mode, MCP servers, settings internals, context management, and custom agents.
+This guide covers configuration beyond the default install: safe mode, MCP servers, settings internals, and context management.
 
 ---
 
-## 1. Permissive Mode
+## 1. Safe Mode
 
-The default install uses **safe settings**: Claude asks before running shell commands (`acceptEdits` mode). This is the right default for most work.
+The default install uses **permissive settings**: Claude executes pre-approved commands without prompting. Dangerous operations (SSH keys, credentials, `sudo`, `rm -rf /`, force push) are still blocked by the deny list.
 
-For autonomous workflows where you want Claude to execute without prompting, copy the permissive settings:
+If you prefer Claude to ask before running shell commands, copy the safe settings:
 
 ```bash
-cp settings-permissive.json ~/.claude/settings.json
+cp settings-safe.json ~/.claude/settings.json
 ```
 
 ### What changes
 
-| Setting | Default | Permissive |
-|---------|---------|------------|
-| `defaultMode` | `acceptEdits` | `autoApprove` |
-| `skipDangerousModePermissionPrompt` | `false` | `true` |
+Both configurations use `defaultMode: "acceptEdits"` — Claude reads and edits files freely, and executes shell commands that match the `permissions.allow` patterns (git, Python, R, Stata, npm, etc.) without asking. Commands NOT in the allow list still require confirmation.
 
-- **`acceptEdits`** -- Claude can read files freely but asks before writing or running commands.
-- **`autoApprove`** -- Claude executes all pre-approved commands without asking.
-- **`skipDangerousModePermissionPrompt`** -- Suppresses the warning dialog when entering auto-approve mode. Without this, Claude shows a confirmation each time you start a session in auto-approve.
+| Setting | Default | Safe |
+|---------|---------|------|
+| `skipDangerousModePermissionPrompt` | `true` | `false` |
 
-### Security implications
+The only difference is the startup warning:
+- **Default (`true`)** -- Claude starts immediately without a "dangerous mode" confirmation dialog. Practical for daily use since the deny list already blocks destructive operations.
+- **Safe (`false`)** -- Claude shows a warning dialog each time you start a session, reminding you that commands will be auto-executed. Useful if you want a deliberate opt-in each session.
 
-In permissive mode, Claude will run any command matching the `permissions.allow` patterns without confirmation. The `permissions.deny` list still blocks dangerous operations (SSH keys, credentials, `sudo`, `rm -rf /`, force push, etc.), but anything not explicitly denied is fair game.
+### Security notes
 
-**Only use permissive mode when:**
-- You are in an isolated environment (container, VM, disposable workspace)
-- You fully trust the task and have reviewed what Claude will do
-- You are running batch/pipeline operations that would be tedious to approve one by one
+In the default permissive mode, Claude will run any command matching the `permissions.allow` patterns without confirmation. The `permissions.deny` list still blocks dangerous operations, but anything not explicitly denied is executed automatically.
 
-### Switching back
+**Consider switching to safe mode when:**
+- You are working with sensitive data or production systems
+- You want to review each command before execution
+- You are unfamiliar with what Claude might do for a given task
+
+### Switching back to permissive
 
 ```bash
 cp settings.json ~/.claude/settings.json
 ```
 
-Or manually set `"defaultMode": "acceptEdits"` in `~/.claude/settings.json`.
+Or manually set `"skipDangerousModePermissionPrompt": true` in `~/.claude/settings.json`.
 
 ---
 
@@ -48,7 +49,7 @@ Or manually set `"defaultMode": "acceptEdits"` in `~/.claude/settings.json`.
 
 MCP (Model Context Protocol) servers extend Claude with external tools. Add them to the `mcpServers` section of `~/.claude/settings.json` or to a project-level `.mcp.json`.
 
-### Zotero MCP (literature management)
+### [Zotero MCP](https://github.com/54yyyu/zotero-mcp) (literature management)
 
 Connects Claude to your Zotero library for searching, reading annotations, and managing references.
 
@@ -74,7 +75,7 @@ Connects Claude to your Zotero library for searching, reading annotations, and m
 
 Once configured, Claude gains tools like `zotero_search_items`, `zotero_semantic_search`, `zotero_get_annotations`, and `zotero_get_item_fulltext`. The `lit-review` and `citation-verification` skills use these under the hood.
 
-### paper-search-mcp (PubMed / arXiv / Semantic Scholar)
+### [paper-search-mcp](https://github.com/openags/paper-search-mcp) (PubMed / arXiv / Semantic Scholar)
 
 Gives Claude direct access to academic paper databases without browser automation.
 
@@ -135,7 +136,7 @@ If validation fails, Claude sees the error and can fix it immediately.
 
 ### `enabledPlugins`
 
-Active Claude Code plugins. The default config enables 16 plugins including context7 (documentation lookup), github (PR/issue management), playwright (browser automation), code-review, and others.
+Active Claude Code plugins. The default config enables 14 plugins including context7 (documentation lookup), github (PR/issue management), playwright (browser automation), code-review, and others.
 
 ### `alwaysThinkingEnabled`
 
@@ -162,7 +163,7 @@ Claude Code sessions have a finite context window. Managing it well is the diffe
 
 Track your usage with:
 - [ccusage CLI](https://github.com/ryoppippi/ccusage) -- Command-line token tracking
-- Claude Code Usage Monitor -- Built-in usage display
+- [Claude Code Usage Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor) -- Browser-based usage dashboard
 
 ### Session hygiene
 
@@ -170,44 +171,3 @@ Track your usage with:
 - **CLAUDE.md is persistent memory.** Put project-specific conventions, file locations, variable naming rules, and important decisions in your project's CLAUDE.md. This persists across sessions -- conversation context does not.
 - **Front-load context.** If Claude needs to know about specific files, mention them early. Referencing a file by name triggers Claude to read it.
 
----
-
-## 5. Custom Agents (Advanced)
-
-### Built-in agents cover most needs
-
-Claude's Task tool already includes specialized agent types. This setup ships 32 agents (statistical-analyst, causal-inference, literature-scout, methods-writer, etc.) that cover the common academic research workflows. Start with these before building your own.
-
-### Creating custom agents
-
-If you need domain-specific behavior not covered by the built-ins, create `.md` files in `~/.claude/agents/`:
-
-```markdown
----
-name: meta-analysis-specialist
-description: Conducts meta-analyses following PRISMA guidelines
----
-
-You are a meta-analysis specialist. You follow PRISMA 2020 guidelines.
-
-When asked to conduct a meta-analysis:
-1. Define inclusion/exclusion criteria
-2. Search for studies using available MCP tools
-3. Extract effect sizes and standard errors
-4. Fit random-effects models using R metafor package
-5. Generate forest plots and funnel plots
-6. Assess publication bias with Egger's test
-```
-
-### How agents work
-
-- Each agent runs as an isolated sub-process with its own context window.
-- Agents can use the same tools as the main Claude session.
-- The main session can delegate work to agents via the Task tool.
-- Agents do not share context with each other or with the main session beyond their return value.
-
-### Guidance
-
-- **Start without custom agents.** The 32 built-in agents handle most academic workflows.
-- **Add agents for repeated specialized tasks** that require specific domain knowledge or multi-step protocols.
-- **Keep agent instructions short and procedural.** Long prose instructions waste the agent's context window.

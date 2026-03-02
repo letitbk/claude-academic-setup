@@ -5,7 +5,7 @@ This setup installs 22 Cursor/VS Code extensions for academic research workflows
 - **Core extensions (14)** are installed by `install.sh`
 - **Optional extensions (8)** are installed by `install-optional.sh`
 
-All extensions have been verified safe with no known security concerns.
+All extensions reviewed as of 2026-03-02 with no known security concerns.
 
 ## Core Extensions (14)
 
