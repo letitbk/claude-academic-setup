@@ -26,13 +26,25 @@ cd ~/your-research-project
 claude
 ```
 
-Try these first prompts:
+Try these first prompts. The key is being specific — vague prompts produce vague results.
 
-1. **"Read my data and describe what you see."** — Give Claude a CSV or Stata file. It will inspect encoding, structure, missing values, and variable types.
+**Prompt 1: Understand your data first.**
 
-2. **"Plan an analysis of [your research question] using [your data]."** — Use `Shift+Tab` to enter Plan Mode. Claude outlines an approach without executing anything. Review the plan, ask questions, revise.
+> Read the file data/survey_2024.csv. Tell me the encoding, number of rows and columns, variable names and types, how missing values are coded, and whether there are any obvious data quality issues like duplicate IDs or impossible values.
 
-3. **"Run the analysis step by step."** — Claude writes code, runs it, checks diagnostics, and iterates. Watch the agentic loop in action.
+Claude will inspect the raw bytes, detect encoding issues (BOM markers, classic Mac line endings), print summary statistics, and flag problems before you write any analysis code. This is the `/datacheck` skill in action.
+
+**Prompt 2: Plan before you execute.** Press `Shift+Tab` to enter Plan Mode first, then type:
+
+> I want to estimate the effect of parental education on children's health outcomes, using data/survey_2024.csv. The outcome is self_rated_health (ordinal, 1-5). Key predictors are parent_education (categorical) and household_income (continuous). I need to control for age, gender, and region. Plan an analysis in R using ordered logistic regression with marginal effects. Ask me questions before you start.
+
+In Plan Mode, Claude outlines the full approach — model specification, variable coding, diagnostics — without running anything. It will ask you clarifying questions (How should you handle missing income? Should you cluster standard errors by region?). Review the plan, revise, then approve.
+
+**Prompt 3: Execute step by step.**
+
+> Run the analysis from the plan. After each step, show me the output and wait for my approval before continuing. Start with data cleaning and recoding.
+
+Claude writes the R code, runs it, shows you the output, and waits. You can say "looks good, continue" or "the income variable has outliers above 500k, winsorize at the 99th percentile." This is the agentic loop — Claude acts, you verify, Claude iterates.
 
 ## Minutes 10-15: Install Plugins
 
