@@ -20,16 +20,62 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 echo "1. Checking prerequisites..."
 
 MISSING=0
-for cmd in claude node python3 jq; do
-  if command -v "$cmd" > /dev/null 2>&1; then
-    ok "$cmd found"
-  else
-    fail "$cmd not found"
-    MISSING=1
-  fi
-done
+
+# Node.js
+if command -v node > /dev/null 2>&1; then
+  NODE_VER=$(node -v | sed 's/v//')
+  ok "node $NODE_VER found"
+else
+  fail "node not found"
+  echo "     Install Node.js 18+:"
+  echo "       macOS:   brew install node"
+  echo "       or:      https://nodejs.org/"
+  echo "       Linux:   https://github.com/nodesource/distributions"
+  MISSING=1
+fi
+
+# Python 3
+if command -v python3 > /dev/null 2>&1; then
+  PY_VER=$(python3 --version | awk '{print $2}')
+  ok "python3 $PY_VER found"
+else
+  fail "python3 not found"
+  echo "     Install Python 3.10+:"
+  echo "       macOS:   brew install python"
+  echo "       or:      https://www.python.org/downloads/"
+  MISSING=1
+fi
+
+# jq
+if command -v jq > /dev/null 2>&1; then
+  ok "jq found"
+else
+  fail "jq not found"
+  echo "     Install jq:"
+  echo "       macOS:   brew install jq"
+  echo "       Linux:   sudo apt install jq  (or yum/dnf)"
+  MISSING=1
+fi
+
+# Claude Code CLI
+if command -v claude > /dev/null 2>&1; then
+  ok "claude found"
+else
+  fail "claude not found"
+  echo "     Install Claude Code CLI:"
+  echo "       npm install -g @anthropic-ai/claude-code"
+  echo "       Docs: https://docs.anthropic.com/en/docs/claude-code"
+  MISSING=1
+fi
+
+# Homebrew check (macOS only — informational)
+if [[ "$OSTYPE" == "darwin"* ]] && ! command -v brew > /dev/null 2>&1; then
+  warn "Homebrew not found — many tools above can be installed via brew"
+  echo "     Install Homebrew: https://brew.sh/"
+fi
 
 if [ "$MISSING" -eq 1 ]; then
+  echo ""
   fail "Missing required tools. Install them and re-run."
   exit 1
 fi
@@ -48,7 +94,7 @@ if command -v Rscript > /dev/null 2>&1; then
   ok "R found"
   HAS_R=1
 else
-  warn "R not found — R package installation will be skipped"
+  warn "R not found — R package installation will be skipped (install from https://cran.r-project.org/)"
 fi
 
 HAS_STATA=0
@@ -258,28 +304,59 @@ echo "   Add to ~/.claude/settings.json mcpServers or use:"
 echo "   npx -y paper-search-mcp"
 echo ""
 echo "   Zotero MCP: Ensure Zotero desktop app is running and API key is set."
-echo "   See: https://github.com/kujenga/zotero-mcp for setup instructions."
+echo "   See: https://github.com/54yyyu/zotero-mcp for setup instructions."
 ok "MCP server instructions printed"
 echo ""
 
 # ---------- 11. Plugin Installation ----------
-echo "11. Plugin installation (manual step)"
+echo "11. Installing Claude Code plugins (13)..."
 echo ""
-echo "   Open Claude Code CLI and run these commands:"
+
+# Add custom marketplaces for non-official plugins
+echo "   Adding plugin marketplaces..."
+claude plugin marketplace add obra/superpowers-marketplace 2>/dev/null \
+  && ok "Marketplace: superpowers-marketplace (obra)" \
+  || warn "Marketplace superpowers-marketplace may already exist"
+
+claude plugin marketplace add backnotprop/plannotator 2>/dev/null \
+  && ok "Marketplace: plannotator (backnotprop)" \
+  || warn "Marketplace plannotator may already exist"
+
+claude plugin marketplace add 777genius/claude-notifications-go 2>/dev/null \
+  && ok "Marketplace: claude-notifications-go (777genius)" \
+  || warn "Marketplace claude-notifications-go may already exist"
+
 echo ""
-echo "   /install superpowers@obra"
-echo "   /install plannotator@plannotator"
-echo "   /install claude-notifications-go@claude-notifications-go"
-echo "   /install ralph-loop@claude-plugins-official"
-echo "   /install playwright@claude-plugins-official"
-echo "   /install code-review@claude-plugins-official"
-echo "   /install github@claude-plugins-official"
-echo "   /install context7@claude-plugins-official"
-echo "   /install feature-dev@claude-plugins-official"
-echo "   /install code-simplifier@claude-plugins-official"
-echo "   /install commit-commands@claude-plugins-official"
-echo "   /install plugin-dev@claude-plugins-official"
-echo "   /install pyright-lsp@claude-plugins-official"
+echo "   Installing plugins..."
+
+# Plugins from custom marketplaces
+CUSTOM_PLUGINS=(
+  "superpowers@superpowers-marketplace"
+  "plannotator@plannotator"
+  "claude-notifications-go@claude-notifications-go"
+)
+
+# Plugins from official marketplace
+OFFICIAL_PLUGINS=(
+  "ralph-loop@claude-plugins-official"
+  "playwright@claude-plugins-official"
+  "code-review@claude-plugins-official"
+  "github@claude-plugins-official"
+  "context7@claude-plugins-official"
+  "feature-dev@claude-plugins-official"
+  "code-simplifier@claude-plugins-official"
+  "commit-commands@claude-plugins-official"
+  "plugin-dev@claude-plugins-official"
+  "pyright-lsp@claude-plugins-official"
+)
+
+for plugin in "${CUSTOM_PLUGINS[@]}" "${OFFICIAL_PLUGINS[@]}"; do
+  plugin_name="${plugin%%@*}"
+  claude plugin install "$plugin" 2>/dev/null \
+    && ok "$plugin_name" \
+    || warn "Failed: $plugin_name — try manually: claude plugin install $plugin"
+done
+
 echo ""
 
 # ---------- 12. Verification ----------
@@ -334,8 +411,7 @@ echo ""
 echo "=== Core setup complete ==="
 echo ""
 echo "Next steps:"
-echo "  1. Install plugins (step 11 above) inside Claude Code CLI"
-echo "  2. Authenticate Gemini: run 'gemini' and sign in"
-echo "  3. Authenticate Codex: run 'codex' and sign in"
-echo "  4. Set up Zotero MCP (see step 10 above)"
-echo "  5. For optional skills (30 more) and extensions: bash install-optional.sh"
+echo "  1. Authenticate Gemini: run 'gemini' and sign in"
+echo "  2. Authenticate Codex: run 'codex' and sign in"
+echo "  3. Set up Zotero MCP (see step 10 above)"
+echo "  4. For optional skills (30 more) and extensions: bash install-optional.sh"

@@ -8,14 +8,15 @@ AI-powered research workstation for social scientists using R, Stata, and Python
 
 ### Prerequisites
 
-| Tool | Install |
-|------|---------|
-| Claude Code CLI | https://code.claude.com/docs/en/quickstart |
-| Node.js 18+ | https://nodejs.org/ |
-| Python 3.10+ | https://www.python.org/ |
-| jq | `brew install jq` |
+| Tool | Install | Notes |
+|------|---------|-------|
+| Homebrew (macOS) | https://brew.sh/ | Package manager — makes everything below easier |
+| Node.js 18+ | `brew install node` or https://nodejs.org/ | Required for Claude Code CLI and plugins |
+| Python 3.10+ | `brew install python` or https://www.python.org/ | Required for analysis packages |
+| jq | `brew install jq` | JSON processing |
+| Claude Code CLI | `npm install -g @anthropic-ai/claude-code` | [Docs](https://docs.anthropic.com/en/docs/claude-code) |
 
-Optional (install skips gracefully if absent): [Cursor](https://cursor.com/), [R 4.3+](https://cran.r-project.org/), [Stata 17+](https://www.stata.com/), [Quarto](https://quarto.org/docs/get-started/), pandoc, latexmk.
+Optional (install skips gracefully if absent): [Cursor](https://cursor.com/), [R 4.3+](https://cran.r-project.org/), [Stata 17+](https://www.stata.com/), [Quarto](https://quarto.org/docs/get-started/), pandoc (`brew install pandoc`), latexmk (`brew install --cask mactex-no-gui`).
 
 ### Install
 
@@ -25,7 +26,7 @@ cd claude-academic-setup
 bash install.sh
 ```
 
-This installs 13 core skills, 7 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (30 additional skills + 8 more extensions), run `bash install-optional.sh` after.
+This installs 13 core skills, 13 plugins, 7 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (30 additional skills + 8 more extensions), run `bash install-optional.sh` after.
 
 > **Security note:** The default settings use `bypassPermissions` mode — Claude executes all pre-approved commands (git, Python, R, Stata, etc.) without asking. Dangerous operations (SSH keys, credentials, `sudo`, `rm -rf /`, force push) are still blocked by the deny list. For a more cautious mode, copy the safe settings: `cp settings-safe.json ~/.claude/settings.json`
 
@@ -155,27 +156,9 @@ Commands you'll use daily. Full reference: [CC101](https://cc101.axwith.com) (to
 
 ## Post-Install Setup
 
-### 1. Install Claude Code Plugins (inside CLI)
+Plugins are installed automatically by `install.sh`. The steps below configure tools that require authentication or API keys.
 
-Open Claude Code and run each command:
-
-```
-/install superpowers@obra
-/install plannotator@plannotator
-/install claude-notifications-go@claude-notifications-go
-/install ralph-loop@claude-plugins-official
-/install playwright@claude-plugins-official
-/install code-review@claude-plugins-official
-/install github@claude-plugins-official
-/install context7@claude-plugins-official
-/install feature-dev@claude-plugins-official
-/install code-simplifier@claude-plugins-official
-/install commit-commands@claude-plugins-official
-/install plugin-dev@claude-plugins-official
-/install pyright-lsp@claude-plugins-official
-```
-
-### 2. Connect Your Literature Tools
+### 1. Connect Your Literature Tools
 
 [**Zotero MCP**](https://github.com/54yyyu/zotero-mcp) (for literature management — highly recommended for social scientists):
 
@@ -212,7 +195,7 @@ Once configured, Claude gains tools like `zotero_search_items`, `zotero_semantic
 
 No API keys needed for basic usage.
 
-### 3. Authenticate AI Review Tools
+### 2. Authenticate AI Review Tools
 
 ```bash
 gemini   # Sign in with Google account
@@ -424,8 +407,10 @@ To switch back: `cp settings.json ~/.claude/settings.json`
 | Claude seems confused or slow | Use `/compact` to clear old context, or `/clear` + start a new session |
 | Claude won't run a command | Check if the command pattern is in `permissions.allow` in `~/.claude/settings.json` |
 | Cursor extensions not installing | Ensure `cursor` is in PATH: open Cursor → `Shell Command: Install 'cursor' command in PATH` |
-| Plugin install fails | Plugins require Claude Code CLI. Run `/install plugin-name@registry` inside a Claude session |
+| Plugin install fails | Run `claude plugin install plugin-name@marketplace` from terminal, or `/install plugin-name@marketplace` inside a Claude session |
 | `npm install -g` permission error | Use `sudo npm install -g` or configure npm to use a user directory: `npm config set prefix ~/.npm-global` |
+| `command not found: brew` (macOS) | Install Homebrew: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
+| `command not found: node` | macOS: `brew install node`. Linux: see https://github.com/nodesource/distributions |
 
 ---
 

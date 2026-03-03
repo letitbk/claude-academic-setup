@@ -46,18 +46,17 @@ In Plan Mode, Claude outlines the full approach — model specification, variabl
 
 Claude writes the R code, runs it, shows you the output, and waits. You can say "looks good, continue" or "the income variable has outliers above 500k, winsorize at the 99th percentile." This is the agentic loop — Claude acts, you verify, Claude iterates.
 
-## Minutes 10-15: Install Plugins
+## Minutes 10-15: Post-Install Setup
 
-Inside your Claude Code session, run these one at a time:
+Plugins were already installed by `install.sh`. Now set up your tools:
 
+```bash
+# Authenticate AI review tools
+gemini   # Sign in with Google account
+codex    # Sign in with OpenAI account
 ```
-/install superpowers@obra
-/install ralph-loop@claude-plugins-official
-/install github@claude-plugins-official
-/install context7@claude-plugins-official
-```
 
-These four give you extended capabilities, autonomous iteration, GitHub integration, and library documentation lookup. Install the remaining 9 plugins later (see the full list in README.md).
+If you use Zotero for references, set up the Zotero MCP server (see README.md → Post-Install Setup → Connect Your Literature Tools). This lets Claude search your library, read annotations, and pull full text.
 
 ---
 
@@ -85,7 +84,7 @@ These four give you extended capabilities, autonomous iteration, GitHub integrat
 After your first session:
 
 1. **Set up CLAUDE.md** in your project — describe your data, research question, and conventions
-2. **Install all 13 plugins** — the full list is in README.md under Post-Install Setup
+2. **Connect Zotero** — see README.md → Post-Install Setup → Connect Your Literature Tools
 3. **Try `/codex` or `/gemini`** — get a second opinion on your analysis plan
 4. **Run `bash install-optional.sh`** if you want the full 43-skill toolkit
 5. **Read the Research Lifecycle section** in README.md for the complete workflow
