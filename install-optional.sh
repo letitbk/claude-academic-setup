@@ -34,7 +34,7 @@ echo ""
 # Core skills to skip (already installed)
 CORE_SKILLS=(
   napkin catch-up codex gemini discuss-claims skill-creator
-  screenshot playwright pdf doc lit-review brainstorming datacheck
+  screenshot playwright pdf doc brainstorming datacheck
 )
 
 is_core() {
@@ -96,4 +96,4 @@ echo "2. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ')
 echo ""
 echo "=== Optional add-ons installed ==="
 echo ""
-echo "See docs/optional-skills.md for descriptions of each optional skill."
+echo "See README.md for descriptions of each optional skill."

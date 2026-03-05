@@ -16,6 +16,8 @@ AI-powered research workstation for social scientists using R, Stata, and Python
 | jq | `brew install jq` | JSON processing |
 | Claude Code CLI | `npm install -g @anthropic-ai/claude-code` | [Docs](https://docs.anthropic.com/en/docs/claude-code) |
 
+**Windows users:** Install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) first, then follow the Linux instructions inside WSL.
+
 Optional (install skips gracefully if absent): [Cursor](https://cursor.com/), [R 4.3+](https://cran.r-project.org/), [Stata 17+](https://www.stata.com/), [Quarto](https://quarto.org/docs/get-started/), pandoc (`brew install pandoc`), latexmk (`brew install --cask mactex-no-gui`).
 
 ### Install
@@ -26,9 +28,9 @@ cd claude-academic-setup
 bash install.sh
 ```
 
-This installs 13 core skills, 13 plugins, 7 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (30 additional skills + 8 more extensions), run `bash install-optional.sh` after.
+This installs 12 core skills, 13 plugins, 7 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (31 additional skills + 8 more extensions), run `bash install-optional.sh` after.
 
-> **Security note:** The default settings use `bypassPermissions` mode — Claude executes all pre-approved commands (git, Python, R, Stata, etc.) without asking. Dangerous operations (SSH keys, credentials, `sudo`, `rm -rf /`, force push) are still blocked by the deny list. For a more cautious mode, copy the safe settings: `cp settings-safe.json ~/.claude/settings.json`
+> **Permissions mode:** The default settings use **Permissive Mode** (`bypassPermissions`) — Claude executes all pre-approved commands (git, Python, R, Stata, etc.) without asking. Dangerous operations (SSH keys, credentials, `sudo`, `rm -rf /`, force push) are still blocked by the deny list. If you're new to Claude Code, consider starting with **Guided Mode** until you're comfortable: `cp settings-safe.json ~/.claude/settings.json`. In Guided Mode, Claude asks before running shell commands. You can check your current mode with `/permissions` inside a session.
 
 New to Claude Code? See the **[15-Minute Quickstart](docs/quickstart.md)** to get from zero to your first research session.
 
@@ -36,13 +38,77 @@ New to Claude Code? See the **[15-Minute Quickstart](docs/quickstart.md)** to ge
 
 ## How Claude Code Works (and Why This Setup Exists)
 
-Claude Code is not a chatbot. It is an autonomous agent that runs in your terminal and IDE. Unlike conversation-based LLMs where you copy-paste code back and forth, Claude Code reads your files, writes code, executes it, checks the output, and iterates — all without you switching windows. Think of it as a research assistant that can read your data dictionary, write an R script, run it, check the diagnostics, and report the results.
+Claude Code is not a chatbot. It is an autonomous agent that **runs in your terminal**. You can also use it inside IDEs — [Cursor](https://cursor.com/), [VS Code](https://code.visualstudio.com/), [Windsurf](https://windsurf.com/), and others — via the Claude Code extension. Unlike conversation-based LLMs where you copy-paste code back and forth, Claude Code reads your files, writes code, executes it, checks the output, and iterates — all without you switching windows. Think of it as a research assistant that can read your data dictionary, write an R script, run it, check the diagnostics, and report the results.
 
 **How it works — the agentic loop.** Claude gathers context (reads files, searches code) → takes action (writes code, runs commands) → verifies results (checks output, fixes errors) → repeats until the task is done. This is fundamentally different from asking a chatbot to generate code that you then manually run and debug.
 
-**CLAUDE.md is your lab notebook.** Claude's context window is working memory — it resets every session. CLAUDE.md is persistent memory that Claude reads at the start of every session. Put your project description, analysis pipeline status, conventions, and key decisions here. This is how Claude remembers what happened last week.
+### CLAUDE.md — Your Lab Notebook
 
-**Skills, plugins, and permissions.** Skills are saved workflows that you invoke with `/skill-name` — they encode expertise so Claude knows how to run a survey analysis or review literature. Plugins add capabilities (GitHub integration, browser automation, notifications). Permissions are guardrails — the default config lets Claude run pre-approved commands automatically while blocking dangerous operations.
+Claude's context window is working memory — it resets every session. CLAUDE.md is persistent memory that Claude reads at the start of every session. There are two levels:
+
+- **Global** (`~/.claude/CLAUDE.md`) — applies to ALL projects. This setup installs one with behavioral guidelines (think before coding, simplicity first, surgical changes).
+- **Project** (`your-project/CLAUDE.md`) — applies to ONE project. This is your lab notebook for that specific research project.
+
+Every research project should have its own project-level CLAUDE.md. Here's an example:
+
+```markdown
+# Project: Parental Education and Child Health
+
+## Research Question
+Effect of parental education on children's self-rated health,
+using NHIS 2024 data.
+
+## Data Files
+- data/nhis_2024.csv — Main dataset (N=12,847, cleaned)
+- data/codebook.xlsx — Variable definitions and coding
+
+## Pipeline Status
+| Step | Status | Output |
+|------|--------|--------|
+| Data cleaning | Done | scripts/01_clean.R |
+| Descriptives | Done | output/table1.docx |
+| Main regression | In progress | scripts/03_ologit.R |
+| Robustness checks | Not started | — |
+
+## Conventions
+- Missing values: coded as NA (recoded from 97/98/99)
+- All models use survey weights (svyset already configured)
+- Tables export to Word via modelsummary
+- Standard errors clustered by region
+```
+
+### Skills, Plugins, and Commands
+
+This setup installs three types of components. They work differently:
+
+| | **Skills** | **Plugins** | **Commands** |
+|---|---|---|---|
+| **Think of it as** | Verbs — actions you take | Nouns — capabilities Claude has | Shortcuts — predefined prompts |
+| **How invoked** | `/skill-name` or triggered automatically by what you say | Work in the background automatically | `/command-name` |
+| **Example** | `/datacheck` inspects a data file | `playwright` lets Claude control a browser | `/updates-git` commits and updates docs |
+| **Can you create your own?** | Yes — use `/skill-creator` and Claude helps you write it | Yes — use `/create-plugin` | Yes — add `.md` files to `~/.claude/commands/` |
+
+**Skills trigger automatically.** You don't always need to type `/skill-name`. If you say "review my data file," Claude activates the `datacheck` skill. If you say "let's brainstorm research questions," Claude activates `brainstorming`. Explicit invocation (`/datacheck`) always works too.
+
+**Plugins work silently.** Once installed, plugins add capabilities that Claude uses when needed. You don't invoke them — Claude just has more abilities (browser automation, GitHub integration, desktop notifications, etc.).
+
+### Independent Verification Tools: /codex and /gemini
+
+These skills send your work to other AI systems for independent review — like getting a second opinion from a different expert.
+
+**`/codex`** — Sends your code or plan to OpenAI's GPT-5.3 for independent code review.
+- **Best for:** Reviewing code changes, checking analysis logic, getting a second opinion on implementation
+- **Install:** `npm install -g @openai/codex` ([GitHub](https://github.com/openai/codex))
+- **Auth:** Run `codex` in terminal and sign in with your OpenAI account
+
+**`/gemini`** — Uses Google's Gemini CLI for web search and URL analysis.
+- **Best for:** Finding recent papers, checking facts, verifying claims against web sources, analyzing URLs
+- **Install:** `npm install -g @google/gemini-cli` ([GitHub](https://github.com/google-gemini/gemini-cli))
+- **Auth:** Run `gemini` in terminal and sign in with your Google account
+
+**When to use which:** Use `/codex` for code review. Use `/gemini` for web research. Use both on important plans for maximum coverage — they catch different things. Both are installed automatically by `install.sh`; you only need to authenticate.
+
+### Other Key Concepts
 
 **Hooks** are event-driven automation — they run automatically when certain things happen. The included hook checks whether documentation needs updating when Claude finishes a task. Hooks can also send desktop notifications or validate file syntax after edits.
 
@@ -61,6 +127,31 @@ Always start by planning. Tell Claude WHAT you want to do and WHY — not HOW. I
 Ask Claude to ask YOU questions back. This produces better results than writing a long prompt upfront — Claude identifies what it needs to know and you provide precise answers.
 
 Review plans with `/codex` or `/gemini` for independent second opinions from GPT-5.3 or Gemini. Use superpowers + plannotator for multi-round detailed planning. Revise until all issues are resolved and you have a clear test framework.
+
+**Plannotator: structured plan review.** After Claude generates a plan, the plannotator plugin opens an interactive review UI where you can annotate specific parts, leave comments, and request changes. This is the structured review step between planning and execution — it ensures you've examined every part of the plan before Claude starts writing code.
+
+**What makes a good plan.** The more detail in your plan, the less you'll need to correct later. Spend 30% of your time planning. A good plan has:
+
+1. **Clear scope** — what's in and what's out
+2. **Specific steps** — not "analyze data" but "run ordered logistic regression on `self_rated_health ~ parent_education + controls`"
+3. **Verification at each step** — how will you know each step succeeded?
+4. **Edge cases identified** — missing data handling, outlier treatment, model convergence
+5. **Dependencies** — which steps must complete before others can start
+
+You can tell Claude: "Review this task and provide a plan that meets all five criteria above."
+
+**Example — vague plan (bad):**
+
+> 1. Clean the data
+> 2. Run the regression
+> 3. Make a table
+
+**Example — detailed plan (good):**
+
+> 1. Load `data/survey_2024.csv`, check encoding, inspect missing value codes (97/98/99). Recode as NA. → *verify: no coded missings remain in key variables*
+> 2. Run ordered logistic regression: `self_rated_health ~ parent_education + household_income + age + gender + region` using `polr()`. → *verify: model converges, proportional odds assumption tested via `brant()` test*
+> 3. Compute average marginal effects via `marginaleffects::avg_slopes()`. → *verify: AMEs have reasonable signs and magnitudes*
+> 4. Export table via `modelsummary()` to `output/table1_ologit.docx` with 3 decimal places and stars. → *verify: table renders correctly in Word*
 
 ### Phase 2: Execution & Data Wrangling
 
@@ -108,6 +199,7 @@ Monitor token usage with [ccusage](https://github.com/ryoppippi/ccusage) CLI or 
 - **Plans are saved automatically.** All plans and conversations are stored locally under `~/.claude/plans` — they're always recoverable. You can also document plans in your project folder.
 - **Use GitHub issues for collaboration.** Ask Claude to create issues summarizing completed work so collaborators can comment and review.
 - **Create skills for repeated work.** If you do something more than twice, use `/skill-creator` to codify it. Use skills to reference the same resources (packages, databases) consistently.
+- **Always verify citations.** If you use Claude for literature-related work, verify every citation against the original source. The `lit-review` and `citation-verification` skills use API-based search (not LLM memory), but manual verification remains essential.
 
 ---
 
@@ -180,7 +272,7 @@ Plugins are installed automatically by `install.sh`. The steps below configure t
 }
 ```
 
-Once configured, Claude gains tools like `zotero_search_items`, `zotero_semantic_search`, `zotero_get_annotations`, and `zotero_get_item_fulltext`. The `lit-review` and `citation-verification` skills use these.
+Once configured, Claude gains tools like `zotero_search_items`, `zotero_semantic_search`, `zotero_get_annotations`, and `zotero_get_item_fulltext`. The `lit-review` and `citation-verification` skills use these (both are optional skills — install with `bash install-optional.sh`).
 
 [**paper-search-mcp**](https://github.com/openags/paper-search-mcp) (for PubMed/arXiv/Semantic Scholar):
 
@@ -206,7 +298,7 @@ codex    # Sign in with OpenAI account
 
 ## Core Components
 
-### Core Skills (13)
+### Core Skills (12)
 
 | Skill | What | Analytic Value |
 |-------|------|----------------|
@@ -220,7 +312,6 @@ codex    # Sign in with OpenAI account
 | `playwright` | Browser automation | Web scraping, form filling, survey platform automation |
 | `pdf` | Read/create/review PDFs | Paper reading and document preparation |
 | `doc` | Read/create/edit .docx | Manuscript and report handling |
-| `lit-review` | Literature reviews | Zotero + paper-search integration for systematic reviews |
 | `brainstorming` | Idea-to-design sessions | Structured hypothesis generation with feedback loops |
 | `datacheck` | Inspect data files | First step before any analysis — encoding, structure, values |
 
@@ -244,9 +335,9 @@ codex    # Sign in with OpenAI account
 
 ---
 
-## Optional Skills (30)
+## Optional Skills (31)
 
-Install with `bash install-optional.sh`. These supplement the 13 core skills but are not required for the base workflow.
+Install with `bash install-optional.sh`. These supplement the 12 core skills but are not required for the base workflow.
 
 ### Data Analysis
 
@@ -297,10 +388,13 @@ Install with `bash install-optional.sh`. These supplement the 13 core skills but
 
 | Skill | Description | When you need it |
 |-------|-------------|------------------|
+| `lit-review` | Literature reviews via Zotero + paper-search APIs for systematic reviews. Uses API-based search, not LLM memory. | Conducting structured literature searches with citation management. |
 | `citation-verification` | Cross-check manuscript citations against Zotero library and Crossref to catch wrong years, missing references, orphaned entries, and formatting inconsistencies. | Auditing your bibliography before submission to catch citation errors. |
 | `research-ideation` | Structured hypothesis generation from literature gaps — maps existing research, identifies unanswered questions, and assesses feasibility with a rubric. | Brainstorming research questions or looking for what to study next in a given field. |
 | `irb-protocol` | Draft IRB protocol documents from research descriptions, covering study purpose, procedures, risks/benefits, informed consent, and data security. | Preparing an IRB application for survey, interview, or secondary data research. |
 | `notebooklm` | Query Google NotebookLM notebooks from Claude Code for source-grounded, citation-backed answers with browser automation and persistent auth. | Querying your uploaded documents in NotebookLM for answers grounded exclusively in your sources. |
+
+> **Citation verification tip:** Always verify LLM-assisted citations against original sources. The `lit-review` and `citation-verification` skills use API-based search (Zotero, Crossref, Semantic Scholar) rather than LLM memory, but manual verification remains essential for academic work.
 
 ### Security
 
@@ -350,25 +444,25 @@ This setup installs 22 Cursor/VS Code extensions. Core extensions (14) are insta
 
 ## Configuration
 
-### Default vs Safe Mode
+### Permissive Mode vs Guided Mode
 
-The default `settings.json` uses `bypassPermissions` mode — Claude executes all pre-approved commands without asking. The `permissions.deny` list blocks dangerous operations.
+| Setting | Default (Permissive) | Safe (Guided) |
+|---------|---------|------|
+| `defaultMode` | `bypassPermissions` | `acceptEdits` |
+| `skipDangerousModePermissionPrompt` | `true` | `false` |
 
-For a more cautious mode, copy the safe settings:
+- **Permissive Mode** (`bypassPermissions`) — Claude executes all pre-approved commands (git, Python, R, etc.) without confirmation. Dangerous operations are still blocked by the deny list. Practical for daily research workflows once you're comfortable with Claude Code.
+- **Guided Mode** (`acceptEdits`) — Claude reads and edits files freely but asks before running any shell commands not explicitly in the allow list. Recommended if you're new to Claude Code.
+
+If you're new, start with Guided Mode:
 
 ```bash
 cp settings-safe.json ~/.claude/settings.json
 ```
 
-| Setting | Default | Safe |
-|---------|---------|------|
-| `defaultMode` | `bypassPermissions` | `acceptEdits` |
-| `skipDangerousModePermissionPrompt` | `true` | `false` |
+To switch to Permissive Mode: `cp settings.json ~/.claude/settings.json`
 
-- **`bypassPermissions`** — Claude executes all allowed operations without confirmation. Practical for daily research workflows.
-- **`acceptEdits`** — Claude reads and edits files freely but asks before running shell commands not in the allow list.
-
-To switch back: `cp settings.json ~/.claude/settings.json`
+Check your current mode with `/permissions` inside a session.
 
 ### Settings Deep Dive
 
@@ -414,12 +508,46 @@ To switch back: `cp settings.json ~/.claude/settings.json`
 
 ---
 
+## FAQ
+
+**What's the difference between CLAUDE.md and a plan?**
+CLAUDE.md is persistent memory that Claude reads every session — your project description, conventions, pipeline status. A plan is a one-time document Claude creates for a specific task. Plans live under `~/.claude/plans/` and are always recoverable. Think of CLAUDE.md as your lab notebook and plans as scratch paper.
+
+**What's the difference between skills, commands, and plugins?**
+Skills are rich workflows with logic (e.g., `/datacheck` runs a multi-step data inspection). Commands are simple prompts (e.g., `/updates-git` runs a predefined update script). Plugins add capabilities to Claude itself (e.g., `playwright` lets Claude control a browser). Skills and commands are invoked with `/name`; plugins work automatically in the background. See the [comparison table](#skills-plugins-and-commands) above.
+
+**Do I need to invoke skills manually?**
+Not always. Skills trigger automatically based on what you say. If you say "review my data file," Claude activates the `datacheck` skill. You can also invoke them explicitly with `/datacheck`.
+
+**Can Claude overwrite my files?**
+In Guided Mode, Claude asks before running shell commands — you approve each one. In Permissive Mode, Claude executes pre-approved commands without asking, but dangerous operations (deleting files, force-pushing) are always blocked by the deny list. See [Permissive Mode vs Guided Mode](#permissive-mode-vs-guided-mode).
+
+**How do I track token usage and costs?**
+Claude Code uses Anthropic API credits (separate from a Claude Pro subscription). Monitor usage with [ccusage](https://github.com/ryoppippi/ccusage) CLI or [Claude Code Usage Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor). Check billing at your [Anthropic Console](https://console.anthropic.com/). Sonnet is cheapest; Opus costs more but handles complex reasoning.
+
+**What model should I use?**
+Sonnet for most tasks (fast, cost-effective). Opus for complex multi-step reasoning. Haiku for simple lookups. Switch with `/model`.
+
+**Where are conversations saved?**
+Under `~/.claude/` — all conversations, plans, and session history are stored locally and recoverable.
+
+**Is my data sent to train the model?**
+No. Claude Code uses the Anthropic API, which does not use your data for model training. Your code and data stay between you and the API. Important for IRB-sensitive research — but still avoid sending PII or protected data in prompts when possible.
+
+**How do I know the code Claude writes is correct?**
+Claude runs code and checks output through the agentic loop — but it can still make mistakes. Always review output, check diagnostics, and verify results against known benchmarks. Use `/codex` or `/gemini` for independent second opinions on critical code.
+
+**When should I use /codex vs /gemini?**
+Use `/codex` for code review and implementation feedback (GPT-5.3). Use `/gemini` for web research, finding papers, and fact-checking. Use both on important plans for maximum coverage. See [Independent Verification Tools](#independent-verification-tools-codex-and-gemini).
+
+---
+
 ## Verification
 
 After install, check counts:
 
 ```bash
-ls -d ~/.claude/skills/*/  | wc -l   # 13 (core) or 43+ (with optional)
+ls -d ~/.claude/skills/*/  | wc -l   # 12 (core) or 43+ (with optional)
 ls ~/.claude/commands/*.md  | wc -l   # 7
 python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))"  # 13
 ```
@@ -432,8 +560,8 @@ python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print
 claude-academic-setup/
 ├── README.md                    # This file
 ├── CLAUDE.md                    # AI behavioral guidelines
-├── install.sh                   # Core install (13 skills, 14 extensions)
-├── install-optional.sh          # Optional add-ons (30 skills, 8 extensions)
+├── install.sh                   # Core install (12 skills, 14 extensions)
+├── install-optional.sh          # Optional add-ons (31 skills, 8 extensions)
 ├── settings.json                # Default settings (bypassPermissions mode)
 ├── settings-safe.json           # Safe mode (acceptEdits, asks before commands)
 ├── docs/

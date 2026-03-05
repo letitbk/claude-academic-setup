@@ -196,7 +196,7 @@ ok "settings.json installed (13 plugins, bypassPermissions mode — dangerous op
 echo ""
 
 # ---------- 5. Core Skills ----------
-echo "5. Copying core skills (13)..."
+echo "5. Copying core skills (12)..."
 
 CORE_SKILLS=(
   napkin
@@ -209,7 +209,6 @@ CORE_SKILLS=(
   playwright
   pdf
   doc
-  lit-review
   brainstorming
   datacheck
 )
@@ -377,7 +376,7 @@ else
   echo "2. Settings.json: INVALID or missing"
 fi
 
-echo "3. Skills: $(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ') (expected: >= 13 core)"
+echo "3. Skills: $(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ') (expected: >= 12 core)"
 echo "4. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 7)"
 
 test -x ~/.claude/hooks/check-docs-update.sh \
