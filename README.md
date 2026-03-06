@@ -560,6 +560,7 @@ python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print
 claude-academic-setup/
 ├── README.md                    # This file
 ├── CLAUDE.md                    # AI behavioral guidelines
+├── presentation.md              # Marp slide deck: Coding Agents for Academic Research
 ├── install.sh                   # Core install (12 skills, 14 extensions)
 ├── install-optional.sh          # Optional add-ons (31 skills, 8 extensions)
 ├── settings.json                # Default settings (bypassPermissions mode)
