@@ -1,78 +1,44 @@
 # CLAUDE.md
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+**Precedence:** system constraints > explicit user request > project CLAUDE.md > this file.
+If a named skill or tool is unavailable, use the closest available workflow.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+## 1. Use Skills When Relevant
 
-## 1. Think Before Coding
+When starting a new task, check for clearly relevant skills and invoke them first. Key triggers:
+- Session start → `napkin`
+- New data → `datacheck`
+- Plots → `viz`
+- Prose → `humanizer` / `stop-slop`
+- Creative work → `brainstorming`
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+Use `AskUserQuestion` (via `ToolSearch`) for structured questions. Fall back to plain text if unavailable.
 
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+## 2. Think Before Coding
 
-## 2. Simplicity First
+- State assumptions. If uncertain, ask.
+- Multiple interpretations → present them, don't pick silently.
+- Simpler approach exists → say so.
 
-**Minimum code that solves the problem. Nothing speculative.**
+## 3. Simplicity First
 
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
+- No features, abstractions, or error handling beyond what's needed.
+- Prefer concise solutions. If it looks overcomplicated, simplify.
 
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+## 4. Surgical Changes
 
-## 3. Surgical Changes
+- Don't improve, refactor, or reformat code you weren't asked to change.
+- Match existing style. Assume the worktree may be dirty.
+- Remove only orphans YOUR changes created.
+- Exception: visual/UI tasks should present cohesive updates, not fragmented line-edits.
 
-**Touch only what you must. Clean up only your own mess.**
+## 5. Reproducible Evidence
 
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+When running substantive analysis (not one-liners or sanity checks):
+- Capture output via `tee` to `logs/YYYY-MM-DD_HH-MM-SS_<description>.log`
+- Keep `logs/` in `.gitignore`. Never commit logs.
+- Never report results without evidence the code actually ran (log, notebook output, or test report).
 
-When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
+## 6. Git
 
-The test: Every changed line should trace directly to the user's request.
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
-
-## 5. Data Handling
-
-- When working with CSV or data files, always check for encoding issues (e.g., classic Mac OS line endings `\r`, BOM markers, mixed delimiters) before parsing. Use `file` command or `head -c 200 <file> | cat -v` to inspect raw bytes first.
-- When creating data visualizations, confirm the exact variable/column names and their meanings before plotting. Print unique values and a few sample rows of each variable being used before generating the chart.
-
-## 6. Visualization Guidelines
-
-For iterative visual refinement tasks (spacing, labels, separators, colors), present a complete implementation in the first pass rather than incremental additions. Ask clarifying questions about all visual elements upfront.
-
-## 7. Git Commits
-
-- NEVER include `Co-Authored-By` lines in commit messages.
-
----
-
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+- Never include `Co-Authored-By` in commit messages.
