@@ -85,5 +85,5 @@ After your first session:
 
 1. **Set up CLAUDE.md** in your project — describe your data, research question, and conventions
 2. **Try `/codex` or `/gemini`** — get a second opinion on your analysis plan
-3. **Run `bash install-optional.sh`** if you want the full 43-skill toolkit
+3. **Run `bash install-optional.sh`** if you want the full 22-skill toolkit
 4. **Read the Research Lifecycle section** in README.md for the complete workflow

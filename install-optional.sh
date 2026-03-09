@@ -62,36 +62,13 @@ done
 echo "   Installed $OPTIONAL_COUNT optional skills"
 echo ""
 
-# ---------- 2. Optional Cursor Extensions ----------
-echo "2. Installing optional Cursor extensions..."
-
-OPTIONAL_EXTENSIONS=(
-  google.gemini-cli-vscode-ide-companion
-  openai.chatgpt
-  hediet.vscode-drawio
-  eamodio.gitlens
-  usernamehw.errorlens
-  oderwat.indent-rainbow
-  alefragnani.project-manager
-  DeepEcon.stata-mcp
-)
-
-if command -v cursor > /dev/null 2>&1; then
-  for ext in "${OPTIONAL_EXTENSIONS[@]}"; do
-    cursor --install-extension "$ext" 2>/dev/null && ok "$ext" || warn "Failed: $ext"
-  done
-else
-  warn "Skipping extensions — cursor not in PATH"
-fi
-echo ""
-
-# ---------- 3. Verification ----------
+# ---------- 2. Verification ----------
 echo "=== Verification ==="
 echo ""
 
 TOTAL_SKILLS=$(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ')
-echo "1. Total skills: $TOTAL_SKILLS (expected: >= 43)"
-echo "2. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 7)"
+echo "1. Total skills: $TOTAL_SKILLS (expected: >= 22)"
+echo "2. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 5)"
 
 echo ""
 echo "=== Optional add-ons installed ==="
