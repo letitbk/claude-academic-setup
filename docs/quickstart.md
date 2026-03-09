@@ -56,7 +56,7 @@ gemini   # Sign in with Google account
 codex    # Sign in with OpenAI account
 ```
 
-If you use Zotero for references, set up the Zotero MCP server (see README.md → Post-Install Setup → Connect Your Literature Tools). This lets Claude search your library, read annotations, and pull full text.
+If you use Zotero for references, you can add MCP servers later for literature management — see the optional skills documentation.
 
 ---
 
@@ -84,7 +84,6 @@ If you use Zotero for references, set up the Zotero MCP server (see README.md �
 After your first session:
 
 1. **Set up CLAUDE.md** in your project — describe your data, research question, and conventions
-2. **Connect Zotero** — see README.md → Post-Install Setup → Connect Your Literature Tools
-3. **Try `/codex` or `/gemini`** — get a second opinion on your analysis plan
-4. **Run `bash install-optional.sh`** if you want the full 43-skill toolkit
-5. **Read the Research Lifecycle section** in README.md for the complete workflow
+2. **Try `/codex` or `/gemini`** — get a second opinion on your analysis plan
+3. **Run `bash install-optional.sh`** if you want the full 43-skill toolkit
+4. **Read the Research Lifecycle section** in README.md for the complete workflow

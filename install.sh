@@ -189,10 +189,10 @@ fi
 echo ""
 
 # ---------- 4. Settings ----------
-echo "4. Copying settings.json (permissive defaults)..."
+echo "4. Copying settings.json (sandbox defaults)..."
 
 cp "$SCRIPT_DIR/settings.json" ~/.claude/settings.json
-ok "settings.json installed (13 plugins, bypassPermissions mode — dangerous ops still blocked)"
+ok "settings.json installed (13 plugins, sandbox mode — OS-level isolation enabled)"
 echo ""
 
 # ---------- 5. Core Skills ----------
@@ -227,7 +227,7 @@ done
 echo ""
 
 # ---------- 6. Commands ----------
-echo "6. Copying commands (7)..."
+echo "6. Copying commands (5)..."
 
 mkdir -p ~/.claude/commands
 for cmd_file in "$SCRIPT_DIR"/commands/*.md; do
@@ -295,20 +295,8 @@ fi
 
 echo ""
 
-# ---------- 10. MCP Servers ----------
-echo "10. MCP server setup..."
-
-echo "   paper-search-mcp can be added to your MCP config."
-echo "   Add to ~/.claude/settings.json mcpServers or use:"
-echo "   npx -y paper-search-mcp"
-echo ""
-echo "   Zotero MCP: Ensure Zotero desktop app is running and API key is set."
-echo "   See: https://github.com/54yyyu/zotero-mcp for setup instructions."
-ok "MCP server instructions printed"
-echo ""
-
-# ---------- 11. Plugin Installation ----------
-echo "11. Installing Claude Code plugins (13)..."
+# ---------- 10. Plugin Installation ----------
+echo "10. Installing Claude Code plugins (13)..."
 echo ""
 
 # Add custom marketplaces for non-official plugins
@@ -358,7 +346,7 @@ done
 
 echo ""
 
-# ---------- 12. Verification ----------
+# ---------- 11. Verification ----------
 echo "=== Verification ==="
 echo ""
 
@@ -377,7 +365,7 @@ else
 fi
 
 echo "3. Skills: $(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ') (expected: >= 12 core)"
-echo "4. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 7)"
+echo "4. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 5)"
 
 test -x ~/.claude/hooks/check-docs-update.sh \
   && echo "5. Hook: executable" \
@@ -412,5 +400,4 @@ echo ""
 echo "Next steps:"
 echo "  1. Authenticate Gemini: run 'gemini' and sign in"
 echo "  2. Authenticate Codex: run 'codex' and sign in"
-echo "  3. Set up Zotero MCP (see step 10 above)"
-echo "  4. For optional skills (30 more) and extensions: bash install-optional.sh"
+echo "  3. For optional skills (31 more) and extensions: bash install-optional.sh"

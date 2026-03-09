@@ -28,9 +28,9 @@ cd claude-academic-setup
 bash install.sh
 ```
 
-This installs 12 core skills, 13 plugins, 7 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (31 additional skills + 8 more extensions), run `bash install-optional.sh` after.
+This installs 12 core skills, 13 plugins, 5 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 core Cursor extensions, and Python/R packages. For the full toolkit (31 additional skills + 8 more extensions), run `bash install-optional.sh` after.
 
-> **Permissions mode:** The default settings use **Permissive Mode** (`bypassPermissions`) — Claude executes all pre-approved commands (git, Python, R, Stata, etc.) without asking. Dangerous operations (SSH keys, credentials, `sudo`, `rm -rf /`, force push) are still blocked by the deny list. If you're new to Claude Code, consider starting with **Guided Mode** until you're comfortable: `cp settings-safe.json ~/.claude/settings.json`. In Guided Mode, Claude asks before running shell commands. You can check your current mode with `/permissions` inside a session.
+> **Permissions mode:** The default settings use **Sandbox Mode** — Claude runs all commands inside an OS-level sandbox that restricts filesystem and network access. Commands execute without prompting because the sandbox itself provides the safety boundary. If you're new to Claude Code, consider starting with **Guided Mode** until you're comfortable: `cp settings-safe.json ~/.claude/settings.json`. In Guided Mode, Claude asks before running shell commands. You can check your current mode with `/permissions` inside a session.
 
 New to Claude Code? See the **[15-Minute Quickstart](docs/quickstart.md)** to get from zero to your first research session.
 
@@ -155,7 +155,7 @@ You can tell Claude: "Review this task and provide a plan that meets all five cr
 
 ### Phase 2: Execution & Data Wrangling
 
-Use ralph-loop for autonomous iteration — Claude works through your analysis step by step until completion. The default configuration uses `bypassPermissions` mode — Claude executes pre-approved commands without asking. Dangerous operations are still blocked. For a more cautious mode where Claude asks before each command, copy `settings-safe.json` to `~/.claude/settings.json`.
+Use ralph-loop for autonomous iteration — Claude works through your analysis step by step until completion. The default configuration uses Sandbox Mode — Claude executes commands freely within an OS-level sandbox that restricts filesystem and network access. For a more cautious mode where Claude asks before each command, copy `settings-safe.json` to `~/.claude/settings.json`.
 
 Claude works like a research assistant through the agentic loop: reads your data, writes analysis code, runs it, checks diagnostics, and fixes issues — all without you intervening at each step.
 
@@ -248,46 +248,7 @@ Commands you'll use daily. Full reference: [CC101](https://cc101.axwith.com) (to
 
 ## Post-Install Setup
 
-Plugins are installed automatically by `install.sh`. The steps below configure tools that require authentication or API keys.
-
-### 1. Connect Your Literature Tools
-
-[**Zotero MCP**](https://github.com/54yyyu/zotero-mcp) (for literature management — highly recommended for social scientists):
-
-1. Install [Zotero desktop app](https://www.zotero.org/download/) and keep it running
-2. Get an API key from https://www.zotero.org/settings/keys
-3. Find your user ID on the same page
-4. Add to `~/.claude/settings.json`:
-
-```json
-"mcpServers": {
-  "zotero": {
-    "command": "npx",
-    "args": ["-y", "zotero-mcp"],
-    "env": {
-      "ZOTERO_API_KEY": "YOUR_KEY",
-      "ZOTERO_USER_ID": "YOUR_ID"
-    }
-  }
-}
-```
-
-Once configured, Claude gains tools like `zotero_search_items`, `zotero_semantic_search`, `zotero_get_annotations`, and `zotero_get_item_fulltext`. The `lit-review` and `citation-verification` skills use these (both are optional skills — install with `bash install-optional.sh`).
-
-[**paper-search-mcp**](https://github.com/openags/paper-search-mcp) (for PubMed/arXiv/Semantic Scholar):
-
-```json
-"mcpServers": {
-  "paper-search": {
-    "command": "npx",
-    "args": ["-y", "paper-search-mcp"]
-  }
-}
-```
-
-No API keys needed for basic usage.
-
-### 2. Authenticate AI Review Tools
+Plugins are installed automatically by `install.sh`. Authenticate the AI review tools:
 
 ```bash
 gemini   # Sign in with Google account
@@ -388,7 +349,7 @@ Install with `bash install-optional.sh`. These supplement the 12 core skills but
 
 | Skill | Description | When you need it |
 |-------|-------------|------------------|
-| `lit-review` | Literature reviews via Zotero + paper-search APIs for systematic reviews. Uses API-based search, not LLM memory. | Conducting structured literature searches with citation management. |
+| `lit-review` | Literature reviews via API-based search (Zotero, Semantic Scholar) for systematic reviews. Uses API-based search, not LLM memory. | Conducting structured literature searches with citation management. |
 | `citation-verification` | Cross-check manuscript citations against Zotero library and Crossref to catch wrong years, missing references, orphaned entries, and formatting inconsistencies. | Auditing your bibliography before submission to catch citation errors. |
 | `research-ideation` | Structured hypothesis generation from literature gaps — maps existing research, identifies unanswered questions, and assesses feasibility with a rubric. | Brainstorming research questions or looking for what to study next in a given field. |
 | `irb-protocol` | Draft IRB protocol documents from research descriptions, covering study purpose, procedures, risks/benefits, informed consent, and data security. | Preparing an IRB application for survey, interview, or secondary data research. |
@@ -444,15 +405,16 @@ This setup installs 22 Cursor/VS Code extensions. Core extensions (14) are insta
 
 ## Configuration
 
-### Permissive Mode vs Guided Mode
+### Sandbox Mode vs Guided Mode
 
-| Setting | Default (Permissive) | Safe (Guided) |
+| Setting | Default (Sandbox) | Safe (Guided) |
 |---------|---------|------|
-| `defaultMode` | `bypassPermissions` | `acceptEdits` |
-| `skipDangerousModePermissionPrompt` | `true` | `false` |
+| `sandbox.enabled` | `true` | `true` |
+| `sandbox.autoAllowBashIfSandboxed` | `true` | `false` |
+| `sandbox.allowUnsandboxedCommands` | `false` | `false` |
 
-- **Permissive Mode** (`bypassPermissions`) — Claude executes all pre-approved commands (git, Python, R, etc.) without confirmation. Dangerous operations are still blocked by the deny list. Practical for daily research workflows once you're comfortable with Claude Code.
-- **Guided Mode** (`acceptEdits`) — Claude reads and edits files freely but asks before running any shell commands not explicitly in the allow list. Recommended if you're new to Claude Code.
+- **Sandbox Mode** — Claude runs all commands inside an OS-level sandbox that restricts filesystem and network access. Commands auto-execute because the sandbox itself provides the safety boundary — Claude can only read/write within the project directory and cannot access secrets, credentials, or the network beyond allowed hosts. This is the recommended default.
+- **Guided Mode** — Claude reads and edits files freely but asks before running any shell commands. The sandbox is still active for added security. Recommended if you're new to Claude Code.
 
 If you're new, start with Guided Mode:
 
@@ -460,15 +422,17 @@ If you're new, start with Guided Mode:
 cp settings-safe.json ~/.claude/settings.json
 ```
 
-To switch to Permissive Mode: `cp settings.json ~/.claude/settings.json`
+To switch to Sandbox Mode: `cp settings.json ~/.claude/settings.json`
 
 Check your current mode with `/permissions` inside a session.
 
 ### Settings Deep Dive
 
+**`sandbox`** — OS-level isolation that restricts filesystem and network access. Commands can only read/write within the project directory and allowed paths. Network access is limited to allowed hosts. This is the primary security boundary — even if a command is in the allow list, the sandbox prevents it from accessing secrets or writing outside the project.
+
 **`permissions.allow`** — Pre-approved tool patterns: file ops (`Read`, `Edit`, `Write`), Node/JS (`npm`, `npx`, `node`), git (status, diff, log, add, commit, push), shell reads (`ls`, `cat`, `find`, `grep`), Python (`python3`, `pip install`), R (`Rscript`, `R CMD`, `renv::`), Stata (`stata`, `stata-mp`), build tools (`make`, `snakemake`, `docker`), publishing (`quarto`, `pandoc`, `latexmk`), and web fetch for select domains.
 
-**`permissions.deny`** — Hard blocks that override allow: secrets (`.ssh/*`, `.env`, `*credentials*`, `*.pem`), destructive commands (`sudo`, `rm -rf /`, `dd`, `mkfs`, `shutdown`, `chmod 777`), dangerous git (`push --force`), Docker cleanup.
+**`permissions.deny`** — Additional blocks that override allow: secrets (`.ssh/*`, `.env`, `*credentials*`, `*.pem`), destructive commands (`sudo`, `rm -rf /`, `dd`, `mkfs`, `shutdown`, `chmod 777`), dangerous git (`push --force`), Docker cleanup.
 
 **`hooks`** — Two hooks configured: (1) Stop hook (`check-docs-update.sh`) runs after Claude finishes responding, prompts to update documentation. (2) PostToolUse hook validates `.json`, `.R`, and `.yml` files after every write/edit.
 
@@ -495,7 +459,6 @@ Check your current mode with `/permissions` inside a session.
 | `command not found: quarto` | Install from https://quarto.org/docs/get-started/ |
 | `command not found: gemini` | Run `npm install -g @google/gemini-cli` then `gemini` to authenticate |
 | `command not found: codex` | Run `npm install -g @openai/codex` then `codex` to authenticate |
-| Zotero MCP not connecting | Ensure Zotero desktop app is running, API key is correct, and user ID is set in `mcpServers` config |
 | `pip install` permission error | Use `pip3 install --user` or set up a virtual environment: `python3 -m venv .venv && source .venv/bin/activate` |
 | R packages fail to install | Open R directly and run `install.packages("package_name")` to see detailed error messages |
 | Claude seems confused or slow | Use `/compact` to clear old context, or `/clear` + start a new session |
@@ -520,7 +483,7 @@ Skills are rich workflows with logic (e.g., `/datacheck` runs a multi-step data 
 Not always. Skills trigger automatically based on what you say. If you say "review my data file," Claude activates the `datacheck` skill. You can also invoke them explicitly with `/datacheck`.
 
 **Can Claude overwrite my files?**
-In Guided Mode, Claude asks before running shell commands — you approve each one. In Permissive Mode, Claude executes pre-approved commands without asking, but dangerous operations (deleting files, force-pushing) are always blocked by the deny list. See [Permissive Mode vs Guided Mode](#permissive-mode-vs-guided-mode).
+In Guided Mode, Claude asks before running shell commands — you approve each one. In Sandbox Mode, Claude executes commands freely but within an OS-level sandbox that restricts filesystem and network access. See [Sandbox Mode vs Guided Mode](#sandbox-mode-vs-guided-mode).
 
 **How do I track token usage and costs?**
 Claude Code uses Anthropic API credits (separate from a Claude Pro subscription). Monitor usage with [ccusage](https://github.com/ryoppippi/ccusage) CLI or [Claude Code Usage Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor). Check billing at your [Anthropic Console](https://console.anthropic.com/). Sonnet is cheapest; Opus costs more but handles complex reasoning.
@@ -548,7 +511,7 @@ After install, check counts:
 
 ```bash
 ls -d ~/.claude/skills/*/  | wc -l   # 12 (core) or 43+ (with optional)
-ls ~/.claude/commands/*.md  | wc -l   # 7
+ls ~/.claude/commands/*.md  | wc -l   # 5
 python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))"  # 13
 ```
 
@@ -563,12 +526,12 @@ claude-academic-setup/
 ├── presentation.md              # Marp slide deck: Coding Agents for Academic Research
 ├── install.sh                   # Core install (12 skills, 14 extensions)
 ├── install-optional.sh          # Optional add-ons (31 skills, 8 extensions)
-├── settings.json                # Default settings (bypassPermissions mode)
-├── settings-safe.json           # Safe mode (acceptEdits, asks before commands)
+├── settings.json                # Default settings (sandbox mode)
+├── settings-safe.json           # Safe mode (guided, asks before commands)
 ├── docs/
 │   └── quickstart.md            # 15-minute quickstart guide
 ├── skills/                      # 43 skill directories
-├── commands/                    # 7 command files
+├── commands/                    # 5 command files
 └── hooks/                       # 1 hook script
 ```
 

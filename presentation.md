@@ -242,7 +242,7 @@ Your expertise + agent execution = the combination that works.
 API-based, not used for training. For extra privacy: use a university-provided service or team plan.
 
 **"Can it overwrite my files?"**
-Configurable. Guided Mode asks before each command. Permissive Mode runs pre-approved commands but blocks dangerous operations.
+Configurable. Guided Mode asks before each command. Sandbox Mode runs commands freely within OS-level sandbox isolation.
 
 **"How do I know the code is correct?"**
 Review output, run diagnostics, get independent second opinions from other AIs.
