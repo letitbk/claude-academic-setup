@@ -192,7 +192,7 @@ echo ""
 echo "4. Copying settings.json (sandbox defaults)..."
 
 cp "$SCRIPT_DIR/settings.json" ~/.claude/settings.json
-ok "settings.json installed (13 plugins, sandbox mode — OS-level isolation enabled)"
+ok "settings.json installed (14 plugins, sandbox mode — OS-level isolation enabled)"
 echo ""
 
 # ---------- 5. Core Skills ----------
@@ -296,7 +296,7 @@ fi
 echo ""
 
 # ---------- 10. Plugin Installation ----------
-echo "10. Installing Claude Code plugins (13)..."
+echo "10. Installing Claude Code plugins (14)..."
 echo ""
 
 # Add custom marketplaces for non-official plugins
@@ -313,6 +313,10 @@ claude plugin marketplace add 777genius/claude-notifications-go 2>/dev/null \
   && ok "Marketplace: claude-notifications-go (777genius)" \
   || warn "Marketplace claude-notifications-go may already exist"
 
+claude plugin marketplace add jarrodwatts/claude-hud 2>/dev/null \
+  && ok "Marketplace: claude-hud (jarrodwatts)" \
+  || warn "Marketplace claude-hud may already exist"
+
 echo ""
 echo "   Installing plugins..."
 
@@ -321,6 +325,7 @@ CUSTOM_PLUGINS=(
   "superpowers@superpowers-marketplace"
   "plannotator@plannotator"
   "claude-notifications-go@claude-notifications-go"
+  "claude-hud@claude-hud"
 )
 
 # Plugins from official marketplace
@@ -359,7 +364,7 @@ fi
 
 if python3 -c "import json; json.load(open('$HOME/.claude/settings.json'))" 2>/dev/null; then
   PLUGIN_COUNT=$(python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))")
-  echo "2. Settings.json: valid, $PLUGIN_COUNT plugins (expected: 13)"
+  echo "2. Settings.json: valid, $PLUGIN_COUNT plugins (expected: 14)"
 else
   echo "2. Settings.json: INVALID or missing"
 fi

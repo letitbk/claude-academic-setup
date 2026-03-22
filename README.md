@@ -28,7 +28,7 @@ cd claude-academic-setup
 bash install.sh
 ```
 
-This installs 12 core skills, 13 plugins, 5 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 Cursor extensions, and Python/R packages. For 10 additional skills, run `bash install-optional.sh` after.
+This installs 12 core skills, 14 plugins, 5 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 Cursor extensions, and Python/R packages. For 10 additional skills, run `bash install-optional.sh` after.
 
 > **Permissions mode:** The default settings use **Sandbox Mode** — Claude runs all commands inside an OS-level sandbox that restricts filesystem and network access. Commands execute without prompting because the sandbox itself provides the safety boundary. If you're new to Claude Code, consider starting with **Guided Mode** until you're comfortable: `cp settings-safe.json ~/.claude/settings.json`. In Guided Mode, Claude asks before running shell commands. You can check your current mode with `/permissions` inside a session.
 
@@ -276,7 +276,7 @@ codex    # Sign in with OpenAI account
 | `brainstorming` | Idea-to-design sessions | Structured hypothesis generation with feedback loops |
 | `datacheck` | Inspect data files | First step before any analysis — encoding, structure, values |
 
-### Core Plugins (13)
+### Core Plugins (14)
 
 | Plugin | Analytic Value |
 |--------|----------------|
@@ -293,6 +293,7 @@ codex    # Sign in with OpenAI account
 | [`commit-commands`](https://github.com/anthropics/claude-plugins-official) | Streamlined git commit, push, and PR workflows |
 | [`plugin-dev`](https://github.com/anthropics/claude-plugins-official) | Create and manage custom plugins |
 | [`pyright-lsp`](https://github.com/anthropics/claude-plugins-official) | Python type checking and IntelliSense |
+| [`claude-hud`](https://github.com/jarrodwatts/claude-hud) | Status line showing tools, agents, todos, and session info |
 
 ---
 
@@ -390,6 +391,8 @@ Check your current mode with `/permissions` inside a session.
 
 **`alwaysThinkingEnabled`** — Extended thinking (chain-of-thought) for every response. Improves quality on complex reasoning but uses more tokens.
 
+**`effortLevel`** — Set to `"high"` so Claude invests more reasoning before answering. Combined with extended thinking, this produces better results on analytical and multi-step tasks.
+
 ### Context Management
 
 - **`/compact`** — Compress conversation history, reclaim working memory. Use when Claude starts forgetting earlier context.
@@ -464,7 +467,7 @@ After install, check counts:
 ```bash
 ls -d ~/.claude/skills/*/  | wc -l   # 12 (core) or 22 (with optional)
 ls ~/.claude/commands/*.md  | wc -l   # 5
-python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))"  # 13
+python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))"  # 14
 ```
 
 ---
