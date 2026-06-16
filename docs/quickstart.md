@@ -21,10 +21,12 @@ The installer handles skills, commands, settings, Cursor extensions, Python/R pa
 ## Minutes 5-10: First Session
 
 ```bash
-# Open Claude Code in any project directory
+# Open a coding agent in any project directory
 cd ~/your-research-project
-claude
+claude        # or: codex  (OpenAI)  /  agy  (Antigravity, for web research)
 ```
+
+The talk demonstrates launching in full-autonomy mode — `claude --dangerously-skip-permissions` (or `codex --yolo`) — so the agent runs without stopping to ask. That's the fastest path, but it removes the OS sandbox. This setup's default keeps the sandbox on (same hands-off feel, with a safety boundary), which is the better choice for IRB-sensitive data. See [Sandbox vs Guided vs full-autonomy](../README.md#sandbox-mode-vs-guided-mode).
 
 ### Two approaches that matter more than any prompt
 
@@ -34,7 +36,7 @@ Most AI coding tools encourage a simple loop: you type a request, the tool produ
 
 **Approach 2: Interactive Q&A — make Claude ask YOU questions.** Instead of writing a long, detailed prompt that tries to anticipate everything, tell Claude to ask you questions first. Claude will surface assumptions you didn't know you were making — how to handle missing data, what counts as an outlier, whether a control variable belongs in the model. This produces better analysis than any prompt you could write alone, because it forces you to articulate decisions you would otherwise make silently.
 
-These two approaches work together. Plan Mode structures the *what*. Interactive Q&A surfaces the *why*. In practice, you'll move between them: plan an analysis, let Claude ask questions that refine the plan, then execute.
+These two approaches work together. Plan Mode structures the *what*. Interactive Q&A surfaces the *why*. In practice, you'll move between them: plan an analysis, let Claude ask questions that refine the plan, then execute. This is the heart of the **plan-based workflow** this whole setup is built around — you communicate through a written plan, review it, execute it, and verify the results against it.
 
 ### Try it
 
@@ -67,10 +69,12 @@ Claude writes the R code, runs it, shows you the output, and waits. You can say 
 Plugins were already installed by `install.sh`. Now set up your tools:
 
 ```bash
-# Authenticate AI review tools
-gemini   # Sign in with Google account
+# Authenticate your review / research agents
+agy      # Antigravity CLI — sign in with Google account (powers /gemini)
 codex    # Sign in with OpenAI account
 ```
+
+If `agy` isn't installed yet: `curl -fsSL https://antigravity.google/cli/install.sh | bash`, then run `agy` to sign in.
 
 If you use Zotero for references, you can add MCP servers later for literature management — see the optional skills documentation.
 

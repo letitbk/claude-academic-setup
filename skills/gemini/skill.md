@@ -1,11 +1,13 @@
 ---
 name: gemini
-description: Web search, URL analysis, and multi-source synthesis using Gemini CLI. Use for online research, fetching and analyzing web pages, combining web search with local files, and synthesizing information from multiple sources.
+description: Web search, URL analysis, and multi-source synthesis using the Antigravity CLI (agy). Use for online research, fetching and analyzing web pages, combining web search with local files, and synthesizing information from multiple sources.
 ---
 
 # Gemini Web Search & Research Skill
 
-Use Google's Gemini CLI for web search, URL deep-dive analysis, and multi-source synthesis. This provides grounded web search with source citations.
+Use Google's Antigravity CLI (`agy`) for web search, URL deep-dive analysis, and multi-source synthesis. This provides grounded web search with source citations.
+
+> Note: This skill previously used the legacy `gemini` CLI. It now drives `agy`. The non-interactive flags are `-p`/`--print` (one-shot prompt), `--dangerously-skip-permissions` (auto-approve tool calls, replaces the old `-y`), and `--add-dir` (add a directory to the workspace, replaces the old `--include-directories`).
 
 ## When to Use This Skill
 
@@ -20,13 +22,14 @@ Trigger when user:
 
 ## Prerequisites
 
-Gemini CLI must be installed and authenticated:
+Antigravity CLI (`agy`) must be installed and authenticated:
 ```bash
 # Check installation
-which gemini
+which agy
 
-# Verify authentication
-gemini --version
+# Verify authentication (also confirms auth/keyring works)
+agy --version
+agy models   # lists available models only when authenticated
 ```
 
 ## Workflow
@@ -57,7 +60,7 @@ Based on mode, collect:
 
 #### Mode 1: Web Search
 ```bash
-gemini -y "Search the web and answer this question: USER_QUERY
+agy --dangerously-skip-permissions -p "Search the web and answer this question: USER_QUERY
 
 Requirements:
 - Provide a comprehensive answer based on current web sources
@@ -68,7 +71,7 @@ Requirements:
 
 #### Mode 2: URL Deep-Dive
 ```bash
-gemini -y "Analyze this webpage: URL_HERE
+agy --dangerously-skip-permissions -p "Analyze this webpage: URL_HERE
 
 Question: USER_QUESTION
 
@@ -80,7 +83,7 @@ Requirements:
 
 #### Mode 3: Multi-Source Synthesis
 ```bash
-gemini -y "Research and synthesize information on these topics:
+agy --dangerously-skip-permissions -p "Research and synthesize information on these topics:
 1. TOPIC_1
 2. TOPIC_2
 3. TOPIC_3
@@ -95,7 +98,7 @@ Requirements:
 
 #### Mode 4: Local + Web
 ```bash
-gemini -y --include-directories /path/to/files "Using @/path/to/local/file.ext as context, search the web to answer: USER_QUERY
+agy --dangerously-skip-permissions --add-dir /path/to/files -p "Using the local file /path/to/local/file.ext as context, search the web to answer: USER_QUERY
 
 Requirements:
 - Ground your search in the context from the local file
@@ -117,10 +120,10 @@ After search completes:
 ### Basic Web Search
 ```bash
 # Simple search
-gemini -y "Search the web for: QUERY. Include source URLs."
+agy --dangerously-skip-permissions -p "Search the web for: QUERY. Include source URLs."
 
 # Detailed research
-gemini -y "Conduct thorough web research on: TOPIC
+agy --dangerously-skip-permissions -p "Conduct thorough web research on: TOPIC
 
 Provide:
 - Key findings (with source URLs)
@@ -132,19 +135,19 @@ Provide:
 ### URL Analysis
 ```bash
 # Summarize a webpage
-gemini -y "Summarize the main points from: URL_HERE. Include the source URL."
+agy --dangerously-skip-permissions -p "Summarize the main points from: URL_HERE. Include the source URL."
 
 # Answer question about URL
-gemini -y "Based on URL_HERE, answer: QUESTION. Cite specific passages."
+agy --dangerously-skip-permissions -p "Based on URL_HERE, answer: QUESTION. Cite specific passages."
 
 # Extract specific information
-gemini -y "From URL_HERE, extract all information about: TOPIC"
+agy --dangerously-skip-permissions -p "From URL_HERE, extract all information about: TOPIC"
 ```
 
 ### Multi-Source Research
 ```bash
 # Compare sources
-gemini -y "Search the web and compare different perspectives on: TOPIC
+agy --dangerously-skip-permissions -p "Search the web and compare different perspectives on: TOPIC
 
 Include:
 - At least 3 different sources
@@ -153,7 +156,7 @@ Include:
 - Source URLs for each perspective"
 
 # Comprehensive research
-gemini -y "Conduct comprehensive research on: TOPIC
+agy --dangerously-skip-permissions -p "Conduct comprehensive research on: TOPIC
 
 Cover:
 - Background and context
@@ -167,13 +170,13 @@ Cover:
 ### Local + Web Combined
 ```bash
 # Fact-check local document
-gemini -y --include-directories /path "Using @/path/document.pdf as reference, search the web to verify the claims made. List which claims are supported, which are contradicted, and which need more evidence. Include source URLs."
+agy --dangerously-skip-permissions --add-dir /path -p "Using the local file /path/document.pdf as reference, search the web to verify the claims made. List which claims are supported, which are contradicted, and which need more evidence. Include source URLs."
 
 # Extend local research
-gemini -y --include-directories /path "Based on @/path/notes.md, search for additional recent research on these topics. What new developments exist? Include source URLs."
+agy --dangerously-skip-permissions --add-dir /path -p "Based on the local file /path/notes.md, search for additional recent research on these topics. What new developments exist? Include source URLs."
 
 # Compare local vs web
-gemini -y --include-directories /path "Compare the information in @/path/report.pdf with current web sources. What's consistent? What's outdated? What's missing? Include source URLs."
+agy --dangerously-skip-permissions --add-dir /path -p "Compare the information in /path/report.pdf with current web sources. What's consistent? What's outdated? What's missing? Include source URLs."
 ```
 
 ## Usage Examples
@@ -189,7 +192,7 @@ Claude asks: What would you like to search for?
 User: Latest developments in mRNA vaccine technology
 
 Claude executes:
-gemini -y "Search the web for the latest developments in mRNA vaccine technology (2025-2026).
+agy --dangerously-skip-permissions -p "Search the web for the latest developments in mRNA vaccine technology (2025-2026).
 
 Requirements:
 - Focus on recent breakthroughs and clinical trials
@@ -211,7 +214,7 @@ Claude asks: What URL and what question?
 User: https://example.com/article - What are the main arguments?
 
 Claude executes:
-gemini -y "Analyze this webpage: https://example.com/article
+agy --dangerously-skip-permissions -p "Analyze this webpage: https://example.com/article
 
 Question: What are the main arguments presented?
 
@@ -232,7 +235,7 @@ Claude asks: Which file(s) and what search query?
 User: Use my paper draft.pdf to find supporting research online
 
 Claude executes:
-gemini -y --include-directories /Users/bk/docs "Using @/Users/bk/docs/draft.pdf as context, search for recent peer-reviewed research that supports or extends the findings in this paper. Include source URLs for all citations."
+agy --dangerously-skip-permissions --add-dir /Users/bk/docs -p "Using the local file /Users/bk/docs/draft.pdf as context, search for recent peer-reviewed research that supports or extends the findings in this paper. Include source URLs for all citations."
 ```
 
 ## AskUserQuestion Template
@@ -319,9 +322,9 @@ Alternative naming by topic:
 
 | Error | Solution |
 |-------|----------|
-| Not authenticated | Run `gemini` interactively to login |
+| Not authenticated | Run `agy` interactively once to login (OAuth into the keyring); `/logout` then relaunch to re-auth |
 | URL not accessible | Check URL is valid and publicly accessible |
-| File not found | Verify file path, use `--include-directories` |
+| File not found | Verify file path, add it with `--add-dir` |
 | Rate limited | Wait and retry, or reduce query complexity |
 | Timeout | Break into smaller queries |
 
@@ -336,7 +339,7 @@ Alternative naming by topic:
 ## Limitations
 
 - Requires internet connection and Google AI access
-- Web search results depend on Gemini's search capabilities
+- Web search results depend on the Antigravity agent's web search/grounding capabilities
 - Some URLs may be blocked or inaccessible
 - Rate limits apply (check Google AI quota)
 - Very long documents may need chunked processing

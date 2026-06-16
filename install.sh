@@ -227,7 +227,7 @@ done
 echo ""
 
 # ---------- 6. Commands ----------
-echo "6. Copying commands (5)..."
+echo "6. Copying commands (7)..."
 
 mkdir -p ~/.claude/commands
 for cmd_file in "$SCRIPT_DIR"/commands/*.md; do
@@ -245,22 +245,31 @@ chmod +x ~/.claude/hooks/check-docs-update.sh
 ok "check-docs-update.sh (executable)"
 echo ""
 
-# ---------- 8. CLAUDE.md ----------
-echo "8. Copying CLAUDE.md..."
+# ---------- 8. CLAUDE.md / AGENTS.md ----------
+echo "8. Copying CLAUDE.md and AGENTS.md..."
 
 cp "$SCRIPT_DIR/CLAUDE.md" ~/.claude/CLAUDE.md
-ok "CLAUDE.md installed"
+ok "CLAUDE.md installed (Claude Code)"
+# AGENTS.md mirrors CLAUDE.md so Codex (and other agents) honor the same rules
+mkdir -p ~/.codex
+if [ -f ~/.codex/AGENTS.md ]; then
+  cp ~/.codex/AGENTS.md ~/.codex/AGENTS.md.bak.$(date +%Y%m%d%H%M%S)
+  warn "Existing ~/.codex/AGENTS.md backed up before overwrite"
+fi
+cp "$SCRIPT_DIR/AGENTS.md" ~/.codex/AGENTS.md
+ok "AGENTS.md installed (Codex / agent-agnostic)"
 echo ""
 
 # ---------- 9. Multi-AI & packages ----------
 echo "9. Installing multi-AI tools and packages..."
 
-# Gemini CLI
-if command -v gemini > /dev/null 2>&1; then
-  ok "Gemini CLI already installed"
+# Antigravity CLI (agy) — powers the /gemini skill for web search
+if command -v agy > /dev/null 2>&1; then
+  ok "Antigravity CLI (agy) already installed"
 else
-  echo "   Installing Gemini CLI..."
-  npm install -g @google/gemini-cli 2>/dev/null && ok "Gemini CLI installed" || warn "Gemini CLI install failed — run: npm install -g @google/gemini-cli"
+  warn "Antigravity CLI (agy) not found — the /gemini skill needs it. Install with:"
+  echo "       curl -fsSL https://antigravity.google/cli/install.sh | bash"
+  echo "       (installs 'agy' to ~/.local/bin; then run 'agy' once to authenticate)"
 fi
 
 # Codex CLI
@@ -370,7 +379,7 @@ else
 fi
 
 echo "3. Skills: $(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ') (expected: >= 12 core)"
-echo "4. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 5)"
+echo "4. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 7)"
 
 test -x ~/.claude/hooks/check-docs-update.sh \
   && echo "5. Hook: executable" \
@@ -380,9 +389,9 @@ test -f ~/.claude/CLAUDE.md \
   && echo "6. CLAUDE.md: present" \
   || echo "6. CLAUDE.md: MISSING"
 
-command -v gemini > /dev/null 2>&1 \
-  && echo "7. Gemini CLI: installed" \
-  || echo "7. Gemini CLI: NOT INSTALLED"
+command -v agy > /dev/null 2>&1 \
+  && echo "7. Antigravity CLI (agy): installed" \
+  || echo "7. Antigravity CLI (agy): NOT INSTALLED — curl -fsSL https://antigravity.google/cli/install.sh | bash"
 
 command -v codex > /dev/null 2>&1 \
   && echo "8. Codex CLI: installed" \
@@ -403,6 +412,6 @@ echo ""
 echo "=== Core setup complete ==="
 echo ""
 echo "Next steps:"
-echo "  1. Authenticate Gemini: run 'gemini' and sign in"
+echo "  1. Authenticate Antigravity (agy): run 'agy' and sign in (powers /gemini)"
 echo "  2. Authenticate Codex: run 'codex' and sign in"
 echo "  3. For optional skills (10 more): bash install-optional.sh"

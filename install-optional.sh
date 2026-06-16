@@ -54,6 +54,10 @@ for skill_dir in "$SCRIPT_DIR"/skills/*/; do
   if is_core "$skill_name"; then
     continue
   fi
+  # Skip directories that aren't real skills (no SKILL.md) — e.g. a stray .venv
+  if [ ! -f "${skill_dir}SKILL.md" ]; then
+    continue
+  fi
   mkdir -p ~/.claude/skills/"$skill_name"
   cp -r "$skill_dir"* ~/.claude/skills/"$skill_name"/
   ok "$skill_name"
@@ -68,7 +72,7 @@ echo ""
 
 TOTAL_SKILLS=$(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l | tr -d ' ')
 echo "1. Total skills: $TOTAL_SKILLS (expected: >= 22)"
-echo "2. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 5)"
+echo "2. Commands: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l | tr -d ' ') (expected: >= 7)"
 
 echo ""
 echo "=== Optional add-ons installed ==="

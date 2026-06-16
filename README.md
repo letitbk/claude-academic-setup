@@ -1,6 +1,6 @@
 # Claude Code + Cursor Setup for Academic Researchers
 
-AI-powered research workstation for social scientists using R, Stata, and Python. This setup configures Claude Code CLI and Cursor IDE with skills, plugins, and workflows designed for the academic research lifecycle.
+AI-powered research workstation for social scientists using R, Stata, and Python. This setup configures coding agents — Claude Code, Codex, and Gemini/Antigravity — and the Cursor IDE with skills, plugins, and workflows for the academic research lifecycle. It is built around a **plan-based workflow**: you communicate with the agent (and your collaborators) through a written plan — review it, execute it, and verify the results against it. The agent makes the work faster; you stay accountable for the claim.
 
 ---
 
@@ -28,9 +28,9 @@ cd claude-academic-setup
 bash install.sh
 ```
 
-This installs 12 core skills, 14 plugins, 5 slash commands, 1 hook, settings, global CLAUDE.md, Gemini CLI + Codex CLI, 14 Cursor extensions, and Python/R packages. For 10 additional skills, run `bash install-optional.sh` after.
+This installs 12 core skills, 14 plugins, 7 slash commands, 1 hook, settings, a global CLAUDE.md + AGENTS.md (so Codex and other agents honor the same rules), the Codex CLI, 14 Cursor extensions, and Python/R packages. It also checks for the Antigravity CLI (`agy`, which powers the `/gemini` skill) and prints the install command if it is missing. For 10 additional skills, run `bash install-optional.sh` after.
 
-> **Permissions mode:** The default settings use **Sandbox Mode** — Claude runs all commands inside an OS-level sandbox that restricts filesystem and network access. Commands execute without prompting because the sandbox itself provides the safety boundary. If you're new to Claude Code, consider starting with **Guided Mode** until you're comfortable: `cp settings-safe.json ~/.claude/settings.json`. In Guided Mode, Claude asks before running shell commands. You can check your current mode with `/permissions` inside a session.
+> **How to launch (and permissions).** The fastest way to work — and what the talk demonstrates — is full-autonomy mode: `claude --dangerously-skip-permissions` (or `codex --yolo`). The agent then runs without stopping to ask. That is convenient but removes the guardrails, so this setup's **default `settings.json` keeps Sandbox Mode** instead: commands still run without prompts, but inside an OS-level sandbox that restricts filesystem and network access — the same hands-off feel, with a safety boundary that matters for IRB-sensitive data. New to this? Start even more cautiously with **Guided Mode** (`cp settings-safe.json ~/.claude/settings.json`), where the agent asks before each shell command. Check your mode anytime with `/permissions`.
 
 New to Claude Code? See the **[15-Minute Quickstart](docs/quickstart.md)** to get from zero to your first research session.
 
@@ -42,12 +42,14 @@ Claude Code is not a chatbot. It is an autonomous agent that **runs in your term
 
 **How it works — the agentic loop.** Claude gathers context (reads files, searches code) → takes action (writes code, runs commands) → verifies results (checks output, fixes errors) → repeats until the task is done. This is fundamentally different from asking a chatbot to generate code that you then manually run and debug.
 
-### CLAUDE.md — Your Lab Notebook
+### CLAUDE.md / AGENTS.md — Your Lab Notebook
 
-Claude's context window is working memory — it resets every session. CLAUDE.md is persistent memory that Claude reads at the start of every session. There are two levels:
+An agent's context window is working memory — it resets every session, and within a session it forgets (the middle of a long context gets lost, and a decoder-only model does not look back unless you make it). A durable rule file is persistent memory that the agent reads at the start of every session. There are two levels:
 
 - **Global** (`~/.claude/CLAUDE.md`) — applies to ALL projects. This setup installs one with behavioral guidelines (think before coding, simplicity first, surgical changes).
 - **Project** (`your-project/CLAUDE.md`) — applies to ONE project. This is your lab notebook for that specific research project.
+
+**Using Codex or Gemini/Antigravity instead of Claude?** Those agents read `AGENTS.md`, not `CLAUDE.md`. This setup ships an `AGENTS.md` that mirrors `CLAUDE.md` (and installs it to `~/.codex/AGENTS.md`) so every agent honors the same rules — keep the two in sync. The `/napkin` skill maintains a third durable file, `.claude/napkin.md`, for per-project mistakes and corrections.
 
 Every research project should have its own project-level CLAUDE.md. Here's an example:
 
@@ -94,19 +96,19 @@ This setup installs three types of components. They work differently:
 
 ### Independent Verification Tools: /codex and /gemini
 
-These skills send your work to other AI systems for independent review — like getting a second opinion from a different expert.
+These skills send your work to other agents for independent review — like getting a second opinion from a different expert. Cross-reviewing a plan or result with more than one agent (codex, gemini, claude) is a core part of the plan-based workflow: each one catches what the others miss.
 
-**`/codex`** — Sends your code or plan to OpenAI's GPT-5.3 for independent code review.
-- **Best for:** Reviewing code changes, checking analysis logic, getting a second opinion on implementation
-- **Install:** `npm install -g @openai/codex` ([GitHub](https://github.com/openai/codex))
+**`/codex`** — Sends your code or plan to OpenAI's GPT-5.5 for independent review and plan evaluation.
+- **Best for:** Reviewing code changes, evaluating implementation plans, checking analysis logic, getting a second opinion
+- **Install:** `npm install -g @openai/codex` ([GitHub](https://github.com/openai/codex)) — installed automatically by `install.sh`
 - **Auth:** Run `codex` in terminal and sign in with your OpenAI account
 
-**`/gemini`** — Uses Google's Gemini CLI for web search and URL analysis.
+**`/gemini`** — Uses Google's Antigravity CLI (`agy`) for web search and URL analysis.
 - **Best for:** Finding recent papers, checking facts, verifying claims against web sources, analyzing URLs
-- **Install:** `npm install -g @google/gemini-cli` ([GitHub](https://github.com/google-gemini/gemini-cli))
-- **Auth:** Run `gemini` in terminal and sign in with your Google account
+- **Install:** `curl -fsSL https://antigravity.google/cli/install.sh | bash` (installs `agy` to `~/.local/bin`) — `install.sh` checks for it and prints this command if missing
+- **Auth:** Run `agy` in terminal and sign in with your Google account
 
-**When to use which:** Use `/codex` for code review. Use `/gemini` for web research. Use both on important plans for maximum coverage — they catch different things. Both are installed automatically by `install.sh`; you only need to authenticate.
+**When to use which:** Use `/codex` for code review and plan evaluation. Use `/gemini` for web research. Use both on important plans for maximum coverage — they catch different things. You only need to authenticate after install.
 
 ### Other Key Concepts
 
@@ -118,15 +120,36 @@ For a comprehensive beginner's guide to Claude Code, see [CC101](https://cc101.a
 
 ---
 
-## The Research Lifecycle with Claude Code
+## The Research Lifecycle: A Plan-Based Workflow
+
+The spine of this setup is a **plan-based workflow** — a middle path between two extremes. At one end is *delegation* (the agent makes the research decisions and you inspect the output at the end — judgment comes too late). At the other is *no plan* (you improvise prompt by prompt). Plan-based sits in between: **you decide, the agent executes.** You write the plan as a markdown file, review it with the agent and your coauthors, revise, then let the agent execute — and you verify the results against the plan.
+
+**The loop:** ask for a plan → the agent asks *you* questions → Q&A → review and revise (you / coauthor / agent) → execute the final plan → verify the result against the plan.
+
+**Why plan? Four payoffs:**
+
+1. **Portable** — any model or agent can read a plan (plan with an expensive model, execute with a cheap one).
+2. **Shared** — coauthors read and review the same document.
+3. **Verifiable** — the plan is the specification you check the results against.
+4. **Ownership** — you set the questions and the standards. The agent makes the work faster, but cannot be accountable for the claim.
+
+**Tools that support the loop** (all installed here):
+
+| To... | Use | What it does |
+|---|---|---|
+| Make it ask before acting | `AskUserQuestion` | Forces the choices into the open |
+| Brainstorm options | `superpowers` | Richer ideation; ends in *your* decision |
+| Review the plan visually | `plannotator` | Annotate the plan and diffs, send back |
+| Review claims with coauthors | `/discuss-claims` | One GitHub issue per empirical claim |
+| Keep it from forgetting | `CLAUDE.md` / `AGENTS.md` · `/napkin` | Project memory across sessions |
 
 ### Phase 1: Research Design & Planning
 
-Always start by planning. Tell Claude WHAT you want to do and WHY — not HOW. If you have ideas about methods, share them, but also ask Claude to explore alternatives. Use Plan Mode (`Shift+Tab`) for complex tasks so you can review Claude's approach before it executes anything.
+Always start by planning. Tell the agent WHAT you want to do and WHY — not HOW. If you have ideas about methods, share them, but also ask the agent to explore alternatives. Use Plan Mode (`Shift+Tab`) for complex tasks so you can review the approach before it executes anything. You don't have to use Plan Mode for everything — but use it for any non-trivial task.
 
 Ask Claude to ask YOU questions back. This produces better results than writing a long prompt upfront — Claude identifies what it needs to know and you provide precise answers.
 
-Review plans with `/codex` or `/gemini` for independent second opinions from GPT-5.3 or Gemini. Use superpowers + plannotator for multi-round detailed planning. Revise until all issues are resolved and you have a clear test framework.
+Review plans with `/codex` or `/gemini` for independent second opinions from GPT-5.5 or Gemini/Antigravity. Use superpowers + plannotator for multi-round detailed planning. Revise until all issues are resolved and you have a clear test framework.
 
 **Plannotator: structured plan review.** After Claude generates a plan, the plannotator plugin opens an interactive review UI where you can annotate specific parts, leave comments, and request changes. This is the structured review step between planning and execution — it ensures you've examined every part of the plan before Claude starts writing code.
 
@@ -191,7 +214,18 @@ Monitor token usage with [ccusage](https://github.com/ryoppippi/ccusage) CLI or 
 
 ## Tips & Lessons Learned
 
-- **Plan as much as possible.** Use Plan Mode (`Shift+Tab`) before any non-trivial task. Have Claude outline its approach, review it with `/codex` or `/gemini`, and revise until you're satisfied. Planning is cheap; re-doing analysis is expensive.
+### Why your first attempts may fail
+
+Two facts about how LLMs work explain most early frustration:
+
+- **It predicts the next token from everything in the context window.** Old errors, abandoned attempts, and stale instructions all condition the next output — *context contamination*. Start a fresh session, `/compact` or `/clear` often, and put durable rules in `CLAUDE.md` / `AGENTS.md` (or `napkin.md`) instead of re-explaining them.
+- **Long contexts forget.** Even with big windows, models attend unevenly (the middle gets lost), and a long session drifts past the rule you gave 40 messages ago. A decoder-only model does not look back unless you ask. Keep plans short and re-readable, give the agent a second chance in a fresh session, and use new (or other) agents to review the plan.
+
+**Two levels of reuse.** *Skills* give you consistency — when you do the same task the same way repeatedly (cleaning survey data by fixed rules, checking data after a merge, using the same API), a skill makes the agent do it the same way every time. *Subagents* give you isolation — each runs in its own clean context, so you can parallelize work without contaminating your main session's context window.
+
+### General tips
+
+- **Plan as much as possible.** Use Plan Mode (`Shift+Tab`) before any non-trivial task. Have the agent outline its approach, review it with `/codex` or `/gemini`, and revise until you're satisfied. Planning is cheap; re-doing analysis is expensive.
 - **Specify WHAT and WHY, not HOW.** Let Claude figure out the implementation. If you have ideas about methods, share them as context, but also ask Claude to explore alternatives.
 - **Ask Claude to ask you questions back.** The AskUserQuestion pattern produces better results than writing a long prompt upfront.
 - **Context is working memory.** Irrelevant context (failed attempts, old errors) degrades performance. Use `/compact` regularly. Start new sessions for unrelated work.
@@ -251,7 +285,7 @@ Commands you'll use daily. Full reference: [CC101](https://cc101.axwith.com) (to
 Plugins are installed automatically by `install.sh`. Authenticate the AI review tools:
 
 ```bash
-gemini   # Sign in with Google account
+agy      # Antigravity CLI — sign in with Google account (powers /gemini)
 codex    # Sign in with OpenAI account
 ```
 
@@ -368,6 +402,7 @@ Installed by `install.sh`. All extensions reviewed as of 2026-03-02 with no know
 
 - **Sandbox Mode** — Claude runs all commands inside an OS-level sandbox that restricts filesystem and network access. Commands auto-execute because the sandbox itself provides the safety boundary — Claude can only read/write within the project directory and cannot access secrets, credentials, or the network beyond allowed hosts. This is the recommended default.
 - **Guided Mode** — Claude reads and edits files freely but asks before running any shell commands. The sandbox is still active for added security. Recommended if you're new to Claude Code.
+- **Full-autonomy mode** — launching with `claude --dangerously-skip-permissions` (or `codex --yolo`) skips prompts *and* the sandbox. It is the fastest and what the talk demonstrates, but it removes the OS-level safety boundary — prefer Sandbox Mode for IRB-sensitive data, and reserve full-autonomy for throwaway or non-sensitive work.
 
 If you're new, start with Guided Mode:
 
@@ -412,7 +447,7 @@ Check your current mode with `/permissions` inside a session.
 | `command not found: Rscript` | Install R from https://cran.r-project.org/ or add to PATH |
 | `command not found: stata` / `stata-mp` | Stata must be installed separately and in PATH. Check: `which stata-mp` |
 | `command not found: quarto` | Install from https://quarto.org/docs/get-started/ |
-| `command not found: gemini` | Run `npm install -g @google/gemini-cli` then `gemini` to authenticate |
+| `command not found: agy` | Install Antigravity CLI: `curl -fsSL https://antigravity.google/cli/install.sh \| bash`, then run `agy` to authenticate |
 | `command not found: codex` | Run `npm install -g @openai/codex` then `codex` to authenticate |
 | `pip install` permission error | Use `pip3 install --user` or set up a virtual environment: `python3 -m venv .venv && source .venv/bin/activate` |
 | R packages fail to install | Open R directly and run `install.packages("package_name")` to see detailed error messages |
@@ -456,7 +491,7 @@ No. Claude Code uses the Anthropic API, which does not use your data for model t
 Claude runs code and checks output through the agentic loop — but it can still make mistakes. Always review output, check diagnostics, and verify results against known benchmarks. Use `/codex` or `/gemini` for independent second opinions on critical code.
 
 **When should I use /codex vs /gemini?**
-Use `/codex` for code review and implementation feedback (GPT-5.3). Use `/gemini` for web research, finding papers, and fact-checking. Use both on important plans for maximum coverage. See [Independent Verification Tools](#independent-verification-tools-codex-and-gemini).
+Use `/codex` for code review and plan evaluation (GPT-5.5). Use `/gemini` (Google's Antigravity CLI, `agy`) for web research, finding papers, and fact-checking. Use both on important plans for maximum coverage. See [Independent Verification Tools](#independent-verification-tools-codex-and-gemini).
 
 ---
 
@@ -466,7 +501,7 @@ After install, check counts:
 
 ```bash
 ls -d ~/.claude/skills/*/  | wc -l   # 12 (core) or 22 (with optional)
-ls ~/.claude/commands/*.md  | wc -l   # 5
+ls ~/.claude/commands/*.md  | wc -l   # 7
 python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print(len(d.get('enabledPlugins', {})))"  # 14
 ```
 
@@ -477,18 +512,27 @@ python3 -c "import json; d=json.load(open('$HOME/.claude/settings.json')); print
 ```
 claude-academic-setup/
 ├── README.md                    # This file
-├── CLAUDE.md                    # AI behavioral guidelines
-├── presentation.md              # Marp slide deck: Coding Agents for Academic Research
+├── LICENSE                      # MIT
+├── CLAUDE.md                    # AI behavioral guidelines (Claude Code)
+├── AGENTS.md                    # Same guidelines for Codex / other agents
+├── presentation_ai_workflow.pdf # Talk: Use Coding Agents as Research Tools (Plan-Based Workflow)
 ├── install.sh                   # Core install (12 skills, 14 extensions)
 ├── install-optional.sh          # Optional add-ons (10 skills)
 ├── settings.json                # Default settings (sandbox mode)
 ├── settings-safe.json           # Safe mode (guided, asks before commands)
 ├── docs/
-│   └── quickstart.md            # 15-minute quickstart guide
+│   ├── quickstart.md            # 15-minute quickstart guide
+│   └── plans/                   # Saved design / plan documents
 ├── skills/                      # 22 skill directories
-├── commands/                    # 5 command files
+├── commands/                    # 7 command files
 └── hooks/                       # 1 hook script
 ```
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright (c) 2026 BK Lee.
 
 ---
 
