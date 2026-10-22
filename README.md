@@ -73,19 +73,9 @@ Install it from [onOrca.dev](https://www.onorca.dev/), or on macOS with:
 brew install --cask stablyai/orca/orca
 ```
 
-Orca does not replace your Claude or ChatGPT subscription. Start with one project and one agent. Add parallel work once you can tell at a glance which branch and folder each agent controls.
-
-### Other tools for the same job
-
-| Tool | License | Platforms | Agents it runs |
-|---|---|---|---|
-| [Conductor](https://conductor.build) | Not stated | macOS | Claude Code, Codex, and others, each in its own worktree |
-| [Superset](https://github.com/superset-sh/superset) | Elastic License 2.0 (source available) | macOS, Linux (experimental) | Claude Code, Codex, Gemini CLI, and other command line agents |
-| [cmux](https://github.com/manaflow-ai/cmux) | GPL 3.0 | macOS | Any command line agent, in a terminal built for agents |
-| [Nimbalyst](https://github.com/nimbalyst/nimbalyst) | MIT | macOS, Windows, Linux | Claude Code and Codex |
-| [Claude Squad](https://github.com/smtg-ai/claude-squad) | AGPL 3.0 | macOS, Linux (needs tmux) | Claude Code, Codex, Gemini, Aider, and others, each in its own worktree |
-
 A worktree keeps each agent's files apart, but it does not limit what the agent's commands can reach on your computer. Keep the permission prompts and sandbox from this setup on.
+
+Orca does not replace your Claude or ChatGPT subscription. Start with one project and one agent. Add parallel work once you can tell at a glance which branch and folder each agent controls.
 
 ### Ask a second model to check the work
 
@@ -183,16 +173,6 @@ claude plugin install <repository>@<repository> --scope user
 ```
 
 For Codex, run `npx skills add letitbk/<repository> -g -a codex`.
-
-## What other researchers report
-
-These sources describe how researchers use coding agents and what goes wrong.
-
-- Anthropic [surveyed 1,260 quantitative social scientists](https://www.anthropic.com/research/coding-agents-social-sciences) in February and March 2026. The sample was a convenience sample, not a representative one. In it, 20 percent used coding agents more than once a week. Among agent users, 86 percent used Claude Code and 31 percent used Codex. Doctoral students and postdocs used agents at more than twice the rate of tenured professors.
-- In [SocSci-Repro-Bench](https://arxiv.org/abs/2606.11447) (Alizadeh, Mosleh, Gilardi, Kasirzadeh, and Tucker, June 2026), Claude Code completed 93.4 percent of 221 reproduction tasks and Codex 62.1 percent. When the prompt nudged the agents to confirm the published results, both did worse on the tasks that could not be reproduced. Claude Code fell from 100 to 70 percent and Codex from 90 to 60 percent, because they gave up a correct finding that the analysis could not be done. Ask an agent to report what it finds, not to match a target.
-- Solomon Messing and Joshua Tucker [describe an agent that deleted half of a dataset](https://www.brookings.edu/articles/the-train-has-left-the-station-agentic-ai-and-the-future-of-social-science-research/) while editing a file. The data were recovered. They expect disclosure of AI use in research to become as common as conflict of interest statements, and they call for a shared checklist. Keep raw data read only and commit often.
-- Paul Goldsmith-Pinkham's [webinar series on Claude Code for applied economists](https://economics.princeton.edu/events/paul-goldsmith-pinkham-mini-series-on-claude-code-for-applied-economists/) covers getting started, data analysis, web scraping, large datasets, and writing. Scott Cunningham writes an ongoing [Claude Code series](https://causalinf.substack.com/s/claude-code) for empirical social science.
-- Simon Willison's guide to [agentic engineering patterns](https://simonwillison.net/guides/agentic-engineering-patterns/) and his post on [running several coding agents in parallel](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/) describe habits that this setup supports. Plan before you edit. Give each parallel agent its own worktree. Start a fresh session when a task changes. Check the result with tests or a second model.
 
 ## Learn more
 

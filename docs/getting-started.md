@@ -280,8 +280,6 @@ brew install --cask stablyai/orca/orca
 
 Connect the agent accounts you already use. Start with one project and one agent. Add a second agent only after you can tell which branch and folder each agent controls.
 
-Other tools do a similar job, e.g., Conductor, Superset, cmux, Nimbalyst, and Claude Squad. The README compares them.
-
 A worktree separates files, not processes. An agent in a worktree can still run any command your account can run, so keep the permission prompts and the sandbox on.
 
 ### Check one model's work with another
