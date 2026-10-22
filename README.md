@@ -122,7 +122,7 @@ Propose one small improvement. Give me a plan before editing anything.
 Make the approved change, run the relevant check, and show me the diff.
 ```
 
-Use `/permissions` to inspect what the agent can do. Review the diff before committing. This setup starts Claude with standard permission prompts and a Bash sandbox. It does not turn on permission bypass mode.
+Use `/permissions` to inspect what the agent can do. Review the diff before committing. This setup starts Claude with standard permission prompts and a Bash sandbox. It does not turn on permission bypass mode. When the prompts start to slow you down, the [beginner guide](docs/getting-started.md#move-to-auto-mode-when-you-are-comfortable) explains how to move to auto mode.
 
 ## Core skills
 

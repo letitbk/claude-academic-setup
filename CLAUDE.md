@@ -9,9 +9,9 @@ Check for a clearly relevant skill before starting a task. Important triggers in
 - Session start: `napkin`
 - New data: `datacheck`
 - Plots and charts: `viz`
-- Prose and documentation: `plain-writing`
+- Prose and documentation: `plain-writing`. For expert or academic writing, keep field terms and stay concise.
 
-For creative or ambiguous work, explore alternatives and ask focused questions before acting. Use a structured question tool when one is available.
+For creative or ambiguous work, use a brainstorming skill when one is installed, e.g., `brainstorming` from Superpowers. Explore alternatives and ask focused questions before acting. Use a structured question tool when one is available.
 
 ## 2. Think before coding
 
@@ -38,7 +38,6 @@ For substantive analysis, capture output in `logs/YYYY-MM-DD_HH-MM-SS_<descripti
 
 ## 6. Use Git carefully
 
-- Never include `Co-Authored-By` in commit messages.
 - Inspect status and diffs before changing or committing files.
 - Do not discard work you did not create.
 
@@ -46,7 +45,8 @@ For substantive analysis, capture output in `logs/YYYY-MM-DD_HH-MM-SS_<descripti
 
 - Write each prose paragraph as one continuous line and let the editor wrap it visually.
 - Insert newlines only between block elements such as paragraphs, headings, list items, tables, and code blocks.
-- Match an existing file that already uses hard wrapping unless the user asks to reflow it.
+- Wrap the body of a Git commit message at about 72 characters.
+- If a file is already hard wrapped, match it, and ask before reflowing it.
 
 ## 8. Get an independent review
 

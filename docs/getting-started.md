@@ -199,11 +199,46 @@ This repository's template uses:
 - an enabled Bash sandbox;
 - prompts even for sandboxed Bash commands;
 - no unsandboxed command escape;
-- deny rules for common secret and credential files.
+- deny rules for common secret and credential files;
+- deny rules for a few destructive commands, e.g., `sudo`, force pushes, and `rm -rf` on your home folder.
+
+Deny rules block a command in every permission mode. They are a backstop for the worst mistakes, not a complete list of risky commands.
 
 Use `/permissions` to inspect the active rules. Do not make permission bypass mode your beginner default. It skips the normal approval layer and is appropriate only inside an environment whose isolation you understand.
 
 The installer merges only missing settings when you choose merge. If your existing file already selects a different permission mode, your existing choice wins.
+
+### Move to auto mode when you are comfortable
+
+Recent Claude Code versions start in auto mode unless a setting says otherwise. The template sets `defaultMode` to `default`, so Claude asks before it edits files or runs most commands. Approving each step is a good way to learn what the agent does. After a few weeks, the prompts mostly slow you down. Auto mode is the next step, and it is the mode I use every day.
+
+In [auto mode](https://code.claude.com/docs/en/permission-modes), Claude works without routine prompts. A separate model reviews each action before it runs and blocks actions that go beyond your request, e.g., a force push, `curl | bash`, or deleting files that existed before the session. Your deny rules and the Bash sandbox still apply. Anthropic's documentation warns that auto mode reduces prompts but does not guarantee safety, so keep committing often and keep reviewing diffs.
+
+To try it for one session, run `claude --permission-mode auto`, or press Shift+Tab until the mode shows auto. To make it your default, set `"defaultMode": "auto"` in `~/.claude/settings.json`. It works only in your user settings file, not in a project's `.claude/settings.json`.
+
+### Optional: check R and YAML syntax after each edit
+
+A hook is a command that Claude Code runs at a fixed point, e.g., after every file edit. The following hook parses each `.R` or `.yaml` file right after Claude writes it, so a syntax error shows up immediately instead of at the end of a long pipeline run. It needs `jq`, R, and Python with `pyyaml`. Add it to the `hooks` key in `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path'); if echo \"$f\" | grep -qE '\\.R$'; then R --no-save --no-restore -e \"parse('$f')\" 2>&1 | tail -3 || true; elif echo \"$f\" | grep -qE '\\.ya?ml$'; then python3 -c \"import yaml; yaml.safe_load(open('$f'))\" 2>&1 || true; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The installer does not add this hook. Run `/hooks` in Claude Code to check that it loaded.
 
 ## Use Git as a checkpoint
 

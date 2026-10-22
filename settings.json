@@ -19,7 +19,16 @@
       "Edit(**/*credentials*)",
       "Edit(**/*secret*)",
       "Edit(**/*.pem)",
-      "Edit(**/*.key)"
+      "Edit(**/*.key)",
+      "Bash(sudo *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/)",
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(chmod 777 *)"
     ]
   },
   "sandbox": {
