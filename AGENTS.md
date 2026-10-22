@@ -1,47 +1,49 @@
 # AGENTS.md
 
-> Agent-agnostic guidelines for Codex, Gemini/Antigravity, Cursor, and other agents.
-> Mirrors `CLAUDE.md` — keep the two in sync so every agent honors the same rules.
+**Precedence:** system or developer constraints override explicit user requests, which override project instructions, which override this global file. If a named skill or tool is unavailable, use the closest available workflow.
 
-**Precedence:** system constraints > explicit user request > project AGENTS.md/CLAUDE.md > this file.
-If a named skill or tool is unavailable, use the closest available workflow.
+## 1. Use relevant skills
 
-## 1. Use Skills When Relevant
+Check for a clearly relevant skill before starting a task. Important triggers include:
 
-When starting a new task, check for clearly relevant skills and invoke them first. Key triggers:
-- Session start → `napkin`
-- New data → `datacheck`
-- Plots → `viz`
-- Prose → `humanizer` / `stop-slop`
-- Creative work → `brainstorming`
+- Session start: `napkin`
+- New data: `datacheck`
+- Plots and charts: `viz`
+- Prose and documentation: `plain-writing`
 
-Use `AskUserQuestion` (via `ToolSearch`) for structured questions. Fall back to plain text if unavailable.
+For creative or ambiguous work, explore alternatives and ask focused questions before acting. Use a structured question tool when one is available.
 
-## 2. Think Before Coding
+## 2. Think before coding
 
-- State assumptions. If uncertain, ask.
-- Multiple interpretations → present them, don't pick silently.
-- Simpler approach exists → say so.
+- State important assumptions.
+- Ask when uncertainty would materially change the result.
+- Present multiple plausible interpretations instead of choosing silently.
+- Point out a simpler approach when one exists.
 
-## 3. Simplicity First
+## 3. Prefer simple solutions
 
-- No features, abstractions, or error handling beyond what's needed.
-- Prefer concise solutions. If it looks overcomplicated, simplify.
+- Do not add features, abstractions, or error handling beyond the request.
+- Prefer the smallest solution that is easy to verify and maintain.
 
-## 4. Surgical Changes
+## 4. Make surgical changes
 
-- Don't improve, refactor, or reformat code you weren't asked to change.
-- Match existing style. Assume the worktree may be dirty.
-- Remove only orphans YOUR changes created.
-- Exception: visual/UI tasks should present cohesive updates, not fragmented line-edits.
+- Do not refactor or reformat unrelated code.
+- Match the existing style and assume the worktree may already contain user changes.
+- Remove only files made obsolete by your own work.
+- For visual work, make the requested area cohesive rather than leaving fragmented changes.
 
-## 5. Reproducible Evidence
+## 5. Keep reproducible evidence
 
-When running substantive analysis (not one-liners or sanity checks):
-- Capture output via `tee` to `logs/YYYY-MM-DD_HH-MM-SS_<description>.log`
-- Keep `logs/` in `.gitignore`. Never commit logs.
-- Never report results without evidence the code actually ran (log, notebook output, or test report).
+For substantive analysis, capture output in `logs/YYYY-MM-DD_HH-MM-SS_<description>.log`. Keep `logs/` in `.gitignore` and never commit logs. Do not report results without evidence that the code ran, such as a log, notebook output, or test report.
 
-## 6. Git
+## 6. Use Git carefully
 
 - Never include `Co-Authored-By` in commit messages.
+- Inspect status and diffs before changing or committing files.
+- Do not discard work you did not create.
+
+## 7. Write prose without hard wrapping
+
+- Write each prose paragraph as one continuous line and let the editor wrap it visually.
+- Insert newlines only between block elements such as paragraphs, headings, list items, tables, and code blocks.
+- Match an existing file that already uses hard wrapping unless the user asks to reflow it.
