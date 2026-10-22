@@ -9,18 +9,12 @@ Use these prompts when manually testing the bundled skills in Claude Code or Cod
 | `datacheck` | “I just received `survey.csv`. Inspect it before we begin analysis.” | Profiles structure, missingness, duplicates, ranges, labels, and join keys before modeling. |
 | `viz` | “Plot the distribution of age by treatment group and save a publication-ready figure.” | Clarifies the comparison, chooses an appropriate chart, renders it, and checks the output visually. |
 | `codex` | “Ask Codex to review my uncommitted changes for correctness.” | Runs a read-only Codex review and reports findings without applying them. |
-| `clean-survey-data` | “Clean these survey exports and preserve their value labels.” | Audits first, documents missing-value and recode decisions, and keeps a reproducible raw-to-clean path. |
-| `marginaleffects` | “Report average marginal effects from this logistic regression with confidence intervals.” | Chooses the estimand and scale explicitly, computes uncertainty, and keeps reference categories clear. |
-| `survey-analysis` | “Estimate a weighted mean and regression from this complex survey.” | Defines the survey design before analysis and uses design-aware estimates and standard errors. |
-| `qualtrics-survey` | “Add a question to my Qualtrics survey through the API.” | Inspects the survey and confirms the target before mutation, without exposing the API token. |
-| `journal-figures` | “Check whether `figure.pdf` meets ASR submission requirements.” | Runs the bundled validator, inspects the rendered figure, and distinguishes automated checks from visual judgment. |
-| `journal-tables` | “Turn these model estimates into an ASR-style regression table.” | Produces and inspects a typeset table plus an editable source, rather than returning only CSV or Markdown. |
+| `agy` | “Get a Gemini second opinion on this plan with agy.” | Runs one `agy -p` review, reports findings, and stops without applying them. |
+| `claude` | In Codex: “Ask Claude to critique this implementation plan.” | Runs a read-only Claude review and reports findings without applying them. |
 
 ## Boundary checks
 
-- Asking for an ordinary code edit should not trigger a research skill.
+- Asking for an ordinary code edit should not trigger a review skill.
 - `datacheck` should inspect a new dataset but should not silently clean or model it.
-- `viz` should build a chart; `journal-figures` should format or validate a finished chart.
-- `marginaleffects` should compute effects; `journal-tables` should typeset the results.
-- The `codex` skill is present only in the Claude installation.
-- Research skills should mention missing external dependencies instead of installing them automatically.
+- The `codex` skill is present only in the Claude installation, and the `claude` skill only in the Codex installation.
+- A review skill should report a missing CLI instead of installing it automatically.

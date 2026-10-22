@@ -245,6 +245,17 @@ install_plugin() {
   PLUGIN_FAILURES=$((PLUGIN_FAILURES + 1))
 }
 
+check_tool() {
+  local tool_name="$1"
+  local purpose="$2"
+  local install_hint="$3"
+  if command -v "$tool_name" >/dev/null 2>&1; then
+    record "found $tool_name"
+  else
+    record "WARNING missing $tool_name ($purpose); install: $install_hint"
+  fi
+}
+
 print_summary() {
   printf '\nSummary\n'
   local item=""

@@ -10,6 +10,7 @@ COMMON_SKILLS=(
   "plain-writing"
   "datacheck"
   "viz"
+  "agy"
 )
 
 CLAUDE_SKILLS=(
@@ -19,13 +20,12 @@ CLAUDE_SKILLS=(
 
 CODEX_SKILLS=(
   "${COMMON_SKILLS[@]}"
+  "claude"
 )
 
 CLAUDE_PLUGINS=(
   "superpowers@claude-plugins-official"
-  "github@claude-plugins-official"
-  "claude-hud@claude-hud"
-  "planboard@planboard"
+  "plannotator@plannotator"
 )
 
 TARGET="$(select_target "${1:-}")" || exit 2
@@ -50,8 +50,7 @@ if target_includes claude "$TARGET"; then
       "$HOME/.claude/skills/$skill_name"
   done
 
-  add_marketplace "jarrodwatts/claude-hud" "claude-hud"
-  add_marketplace "letitbk/planboard" "planboard"
+  add_marketplace "backnotprop/plannotator" "plannotator"
 
   for plugin_id in "${CLAUDE_PLUGINS[@]}"; do
     install_plugin "$plugin_id"
@@ -69,6 +68,15 @@ if target_includes codex "$TARGET"; then
       "$SCRIPT_DIR/skills/$skill_name" \
       "$HOME/.codex/skills/$skill_name"
   done
+fi
+
+check_tool agy "/agy reviews" "curl -fsSL https://antigravity.google/cli/install.sh | bash"
+if target_includes claude "$TARGET"; then
+  check_tool plannotator "Plannotator plugin" "curl -fsSL https://plannotator.ai/install.sh | bash"
+  check_tool codex "/codex reviews" "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
+fi
+if target_includes codex "$TARGET"; then
+  check_tool claude "\$claude reviews" "curl -fsSL https://claude.ai/install.sh | bash"
 fi
 
 print_summary

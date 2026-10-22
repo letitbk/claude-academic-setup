@@ -4,9 +4,9 @@ This guide explains the setup in this repository. It assumes that you are comfor
 
 ## Choose Claude Code, Codex, or both
 
-Both agents can read a repository, edit files, run programs, and inspect the result. The main difference for this setup is that Planboard is a Claude Code plugin. A Codex only setup still supports ordinary coding and research work, but it cannot host Planboard.
+Both agents can read a repository, edit files, run programs, and inspect the result. Choose Claude Code if you already use Claude. Choose Codex if you already use ChatGPT or prefer Codex as your main terminal agent. Choose both if you want one model to review the work of the other.
 
-Choose Claude Code if you already use Claude or want the Planboard workflow. Choose Codex if you already use ChatGPT or prefer Codex as your main terminal agent. Choose both if you want one model to review another.
+The optional Planboard workflow is a Claude Code plugin. A Codex only setup still supports ordinary coding and research work, but it cannot host Planboard.
 
 ## Install the agent itself
 
@@ -40,15 +40,13 @@ Before copying, back up any destination that already exists. For Claude Code:
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
 Copy-Item .\CLAUDE.md "$HOME\.claude\CLAUDE.md"
 Copy-Item .\settings.json "$HOME\.claude\settings.json"
-foreach ($skill in "napkin", "plain-writing", "datacheck", "viz", "codex") {
+foreach ($skill in "napkin", "plain-writing", "datacheck", "viz", "agy", "codex") {
   Copy-Item -Recurse ".\skills\$skill" "$HOME\.claude\skills\$skill"
 }
-claude plugin marketplace add jarrodwatts/claude-hud
-claude plugin marketplace add letitbk/planboard
+claude plugin marketplace add backnotprop/plannotator
 claude plugin install superpowers@claude-plugins-official --scope user
-claude plugin install github@claude-plugins-official --scope user
-claude plugin install claude-hud@claude-hud --scope user
-claude plugin install planboard@planboard --scope user
+claude plugin install plannotator@plannotator --scope user
+irm https://plannotator.ai/install.ps1 | iex
 ```
 
 On native Windows, edit the copied `settings.json` and set `sandbox.enabled` to `false`; keep standard permission prompts and the deny rules. Leave it enabled when running Claude Code in WSL.
@@ -58,7 +56,7 @@ For Codex:
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
 Copy-Item .\AGENTS.md "$HOME\.codex\AGENTS.md"
-foreach ($skill in "napkin", "plain-writing", "datacheck", "viz") {
+foreach ($skill in "napkin", "plain-writing", "datacheck", "viz", "agy", "claude") {
   Copy-Item -Recurse ".\skills\$skill" "$HOME\.codex\skills\$skill"
 }
 ```
@@ -81,10 +79,16 @@ The script checks prerequisites before writing. It then installs:
 
 | Target | Instructions | Skills | Other configuration |
 |---|---|---|---|
-| Claude | `~/.claude/CLAUDE.md` | Four shared skills plus `/codex` | Minimal settings and four user plugins |
-| Codex | `~/.codex/AGENTS.md` | Four shared skills | No Claude settings or plugins |
+| Claude | `~/.claude/CLAUDE.md` | Five shared skills plus `codex` | Minimal settings and two user plugins |
+| Codex | `~/.codex/AGENTS.md` | Five shared skills plus `claude` | No Claude settings or plugins |
 
-The shared skills are `napkin`, `plain-writing`, `datacheck`, and `viz`.
+The shared skills are `napkin`, `plain-writing`, `datacheck`, `viz`, and `agy`. The `codex` skill lets Claude ask Codex for a review, and the `claude` skill lets Codex ask Claude.
+
+The installer then checks for the programs that the review skills and plugins call: `agy`, `plannotator`, and the other agent's command line tool. If one is missing, the summary prints a warning and the command to install it. Setup still succeeds.
+
+### Where Codex looks for skills
+
+This installer copies Codex skills to `~/.codex/skills`, which current Codex versions read. The [Codex documentation](https://learn.chatgpt.com/docs/build-skills) names `~/.agents/skills` as the user skill folder, and tools such as `npx skills add -a codex` install there. Keep each skill in only one of the two folders. If the same skill is in both, Codex may list it twice.
 
 ### What happens when a file already exists
 
@@ -178,12 +182,12 @@ The Claude setup installs:
 
 | Plugin | Why it is included |
 |---|---|
-| Planboard | Durable plans, decisions, results, and review for research projects |
 | Superpowers | General planning, debugging, testing, and development discipline |
-| Claude HUD | Visible session and context information |
-| GitHub | Issues, pull requests, and repository collaboration |
+| Plannotator | Review and annotate a plan or a diff in the browser before the agent continues |
 
-Use `/plugin` in Claude Code to inspect, update, disable, or uninstall plugins. Use `/mcp` if the GitHub integration needs authentication.
+Plannotator needs the `plannotator` program. Install it with `curl -fsSL https://plannotator.ai/install.sh | bash` on macOS, Linux, or WSL.
+
+Use `/plugin` in Claude Code to inspect, update, disable, or uninstall plugins.
 
 ## Permissions and sandboxing
 
@@ -229,9 +233,14 @@ Planboard provides a stronger record for long research projects. It stores plans
 
 ## Add Planboard after learning the basic loop
 
-Planboard is installed for Claude users during bootstrap. It remains inactive until a project opts in.
+Planboard is optional and is not installed by default. Use it when the project will be revised, shared, submitted, or defended later. A throwaway exploration usually does not need it.
 
-Use it when the project will be revised, shared, submitted, or defended later. A throwaway exploration usually does not need it.
+```bash
+claude plugin marketplace add letitbk/planboard
+claude plugin install planboard@planboard --scope user
+```
+
+Then, in a research project:
 
 ```text
 /planboard:init
@@ -243,29 +252,25 @@ The first command interviews you about the project. The second prepares a review
 
 Planboard can ask Codex to review work, but Claude Code must host the plugin. Read the [Planboard quickstart](https://github.com/letitbk/planboard/blob/main/QUICKSTART.md) for the complete workflow.
 
-## Add the research skill bundle only when needed
+## Add single purpose research skills when needed
 
-```bash
-bash install-research-skills.sh claude
-# or: codex / both
-```
+Research skills that solve one problem each live in their own repositories: coauthor, journal-style, qualtrics-skills, annotated-site, and dataverse-skills. The README lists what each one does. Install only what a project needs, and install each skill's own dependencies, such as R packages or an API token, as its README describes. This setup does not change your R or Python environments.
 
-The script installs a fixed set. It does not scan the repository and install every skill it finds.
+## Work on many projects at once
 
-| Skill | External requirements |
-|---|---|
-| `clean-survey-data` | R packages named in the skill |
-| `marginaleffects` | R and the `marginaleffects` package |
-| `survey-analysis` | R and the `survey` package |
-| `qualtrics-survey` | A Qualtrics API token and Python or curl |
-| `journal-figures` | Python image and PDF packages |
-| `journal-tables` | R, LaTeX, Poppler, and Pandoc |
+Once agents help with real research, you will run them on several projects, and often run more than one session in a project. Decide early how you will keep track of them. For each session you should be able to answer these questions at a glance:
 
-Install only the dependencies needed by your project. The setup scripts do not modify your R or Python environments.
+- Which project folder and which Git branch is it working in?
+- What has it changed since your last commit?
+- Has a person or a second model checked the result?
 
-## Use Orca after you understand the CLI
+### If you use one provider, use its desktop app
 
-Orca is a visual workspace for command line agents. It can create separate Git worktrees, run several agents side by side, display repository files, and annotate diffs.
+The [Claude desktop app](https://claude.com/resources/articles/claude-code-desktop-redesign) lists every Claude Code session in a sidebar that you can group by project. Each session has a diff viewer, a file editor, an HTML and PDF preview pane, and a terminal. The [ChatGPT desktop app](https://learn.chatgpt.com/docs/app) lets you switch between ChatGPT and Codex and run projects in parallel. Both apps read the same skill folders that this installer writes. The installer needs the `claude` or `codex` command line tool. If you only have a desktop app, install the command line tool as described above, or copy the files with the PowerShell commands and their macOS or Linux equivalents.
+
+### If you are comfortable in a terminal, try Orca
+
+[Orca](https://github.com/stablyai/orca) is a free, open source desktop app for macOS, Windows, and Linux that runs any command line agent. It gives each task its own Git worktree. A worktree is a second checkout of the same repository on a separate branch, so two agents do not edit the same files. Orca also shows code, Markdown, images, and PDFs next to each agent, and you can comment on a diff line and send the comment back to the agent.
 
 Install it from [onOrca.dev](https://www.onorca.dev/) or on macOS:
 
@@ -273,7 +278,30 @@ Install it from [onOrca.dev](https://www.onorca.dev/) or on macOS:
 brew install --cask stablyai/orca/orca
 ```
 
-Connect the agent accounts you already use. Start with one worktree and one agent. Add parallel work only after you are comfortable checking which branch and directory each agent controls.
+Connect the agent accounts you already use. Start with one project and one agent. Add a second agent only after you can tell which branch and folder each agent controls.
+
+Other tools do a similar job, e.g., Conductor, Superset, cmux, Nimbalyst, and Claude Squad. The README compares them.
+
+A worktree separates files, not processes. An agent in a worktree can still run any command your account can run, so keep the permission prompts and the sandbox on.
+
+### Check one model's work with another
+
+With several agents open, it is easy to ask a second model to review a plan or a result before you accept it. A model from another company does not share the first model's reasoning, so it often catches different mistakes.
+
+- In Claude Code, run `/codex` for a Codex review or `/agy` for a Gemini review.
+- In Codex, run `$claude` for a Claude review or `$agy` for a Gemini review.
+
+Each review skill reports its findings and stops. You choose which findings to act on.
+
+The `agy` skill starts the Antigravity CLI with `--dangerously-skip-permissions`. The Antigravity CLI cannot show a permission prompt when it runs from a script, so without the flag it stops at its first command. This is the one place in the setup that skips permission prompts. The review prompt asks only for text, but the flag does not enforce that. Commit or stash your work before a review, so that `git status` shows any change the reviewer makes.
+
+Install the Antigravity CLI from [Google's instructions](https://antigravity.google/docs/getting-started?tab=cli). On macOS and Linux:
+
+```bash
+curl -fsSL https://antigravity.google/cli/install.sh | bash
+```
+
+Google stopped serving Gemini CLI for personal Google accounts on June 18, 2026 and points users to the Antigravity products, so this setup uses `agy` rather than Gemini CLI.
 
 ## Updating from an older version of this repository
 
@@ -288,6 +316,8 @@ find ~/.claude/skills -mindepth 1 -maxdepth 1 -type d
 
 Use Claude's `/plugin` screen to disable an old plugin before uninstalling it. Move a skill directory to a backup before deleting it. The current repository manifest in the README is the source of truth for what a fresh install includes.
 
+Earlier versions of this repository installed Claude HUD, the GitHub plugin, and Planboard by default, and included a research skill bundle with survey, marginal effects, Qualtrics, and journal formatting skills. Planboard is now optional. The Qualtrics and journal skills moved to their own repositories. Your existing copies keep working until you remove them.
+
 ## Troubleshooting
 
 | Problem | Check |
@@ -295,7 +325,9 @@ Use Claude's `/plugin` screen to disable an old plugin before uninstalling it. M
 | `claude` or `codex` is not found | Reopen the terminal, then run the official installer again |
 | Installer stops before writing | Confirm the selected CLI and `python3` are on `PATH` |
 | A plugin fails | Run the exact retry command printed by the installer |
-| GitHub plugin cannot connect | Open `/mcp` in Claude and complete authentication |
+| The summary warns that `agy` is missing | Install the Antigravity CLI, then run `agy` once to sign in |
+| The summary warns that `plannotator` is missing | Run `curl -fsSL https://plannotator.ai/install.sh \| bash` |
+| A skill appears twice in Codex | Keep it in only one of `~/.codex/skills` and `~/.agents/skills` |
 | Sandbox unavailable | Use WSL on Windows, or follow the Claude sandbox troubleshooting guide |
 | Skill does not trigger | Restart the agent and ask for the task in ordinary language or invoke the skill explicitly |
 | Existing settings behave differently | Your existing values win when you choose merge; inspect them with `/permissions` |
@@ -318,5 +350,8 @@ git status
 - [Claude Code plugins](https://code.claude.com/docs/en/discover-plugins)
 - [Codex CLI](https://developers.openai.com/codex/cli/)
 - [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md/)
+- [Codex skills](https://learn.chatgpt.com/docs/build-skills)
+- [Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli)
+- [Plannotator](https://github.com/backnotprop/plannotator)
 - [Planboard](https://github.com/letitbk/planboard)
 - [Orca](https://github.com/stablyai/orca)

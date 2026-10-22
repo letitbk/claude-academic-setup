@@ -86,7 +86,7 @@ run_script() {
       MOCK_LOG="$home_dir/mock.log" \
       MOCK_PLUGIN_JSON="${MOCK_PLUGIN_JSON:-[]}" \
       MOCK_FAIL_MATCH="${MOCK_FAIL_MATCH:-}" \
-      PATH="$MOCK_BIN:$PATH" \
+      PATH="$MOCK_BIN:${TEST_PATH:-$PATH}" \
       bash "$ROOT/$script_name" "$target" >"$output_file" 2>&1
   else
     env \
@@ -94,7 +94,7 @@ run_script() {
       MOCK_LOG="$home_dir/mock.log" \
       MOCK_PLUGIN_JSON="${MOCK_PLUGIN_JSON:-[]}" \
       MOCK_FAIL_MATCH="${MOCK_FAIL_MATCH:-}" \
-      PATH="$MOCK_BIN:$PATH" \
+      PATH="$MOCK_BIN:${TEST_PATH:-$PATH}" \
       bash "$ROOT/$script_name" "$target" >"$output_file" 2>&1
   fi
 }
@@ -107,15 +107,14 @@ else
 fi
 expect_file "$claude_home/.claude/CLAUDE.md" "Claude instructions installed"
 expect_file "$claude_home/.claude/settings.json" "Claude settings installed"
-expect_skill_count "$claude_home/.claude/skills" 5 "Claude core skill manifest"
+expect_skill_count "$claude_home/.claude/skills" 6 "Claude core skill manifest"
+expect_dir "$claude_home/.claude/skills/codex" "Claude target installs /codex"
+expect_absent "$claude_home/.claude/skills/claude" "Claude target skips the Codex-only reviewer"
 expect_absent "$claude_home/.codex" "Claude target leaves Codex untouched"
-expect_log_line "$claude_home/mock.log" "plugin marketplace add jarrodwatts/claude-hud" "HUD marketplace command"
-expect_log_line "$claude_home/mock.log" "plugin marketplace add letitbk/planboard" "Planboard marketplace command"
+expect_log_line "$claude_home/mock.log" "plugin marketplace add backnotprop/plannotator" "Plannotator marketplace command"
 for plugin_id in \
   superpowers@claude-plugins-official \
-  github@claude-plugins-official \
-  claude-hud@claude-hud \
-  planboard@planboard; do
+  plannotator@plannotator; do
   expect_log_line "$claude_home/mock.log" "plugin install $plugin_id --scope user" "Plugin install command: $plugin_id"
 done
 
@@ -134,7 +133,9 @@ else
   fail "Codex target exits successfully"
 fi
 expect_file "$codex_home/.codex/AGENTS.md" "Codex instructions installed"
-expect_skill_count "$codex_home/.codex/skills" 4 "Codex core skill manifest"
+expect_skill_count "$codex_home/.codex/skills" 6 "Codex core skill manifest"
+expect_dir "$codex_home/.codex/skills/claude" "Codex target installs the Claude reviewer"
+expect_absent "$codex_home/.codex/skills/codex" "Codex target skips /codex"
 expect_absent "$codex_home/.claude" "Codex target leaves Claude untouched"
 
 both_home="$TEST_ROOT/both-home"
@@ -143,20 +144,20 @@ if run_script "$both_home" install.sh both; then
 else
   fail "Both target exits successfully"
 fi
-expect_skill_count "$both_home/.claude/skills" 5 "Both target installs Claude core skills"
-expect_skill_count "$both_home/.codex/skills" 4 "Both target installs Codex core skills"
+expect_skill_count "$both_home/.claude/skills" 6 "Both target installs Claude core skills"
+expect_skill_count "$both_home/.codex/skills" 6 "Both target installs Codex core skills"
 
-if run_script "$both_home" install-research-skills.sh both; then
-  pass "Research target exits successfully"
+tools_home="$TEST_ROOT/tools-home"
+system_bin="$TEST_ROOT/system-python-bin"
+mkdir -p "$system_bin"
+ln -s "$(python3 -c 'import sys; print(sys.executable)')" "$system_bin/python3"
+if TEST_PATH="$system_bin:/usr/bin:/bin" run_script "$tools_home" install.sh claude; then
+  pass "Missing optional tools do not fail setup"
 else
-  fail "Research target exits successfully"
+  fail "Missing optional tools do not fail setup"
 fi
-expect_skill_count "$both_home/.claude/skills" 11 "Research bundle extends Claude manifest"
-expect_skill_count "$both_home/.codex/skills" 10 "Research bundle extends Codex manifest"
-for skill_name in clean-survey-data marginaleffects survey-analysis qualtrics-survey journal-figures journal-tables; do
-  expect_dir "$both_home/.claude/skills/$skill_name" "Claude research skill: $skill_name"
-  expect_dir "$both_home/.codex/skills/$skill_name" "Codex research skill: $skill_name"
-done
+expect_text "$tools_home/output.log" "WARNING missing agy" "Missing agy is reported"
+expect_text "$tools_home/output.log" "WARNING missing plannotator" "Missing plannotator is reported"
 
 settings_home="$TEST_ROOT/settings-home"
 mkdir -p "$settings_home/.claude"
@@ -225,24 +226,24 @@ else
 fi
 
 disabled_home="$TEST_ROOT/disabled-home"
-MOCK_PLUGIN_JSON='[{"id":"superpowers@claude-plugins-official","enabled":false},{"id":"github@claude-plugins-official","enabled":true},{"id":"claude-hud@claude-hud","enabled":true},{"id":"planboard@planboard","enabled":true}]'
+MOCK_PLUGIN_JSON='[{"id":"superpowers@claude-plugins-official","enabled":false},{"id":"plannotator@plannotator","enabled":true}]'
 if run_script "$disabled_home" install.sh claude; then
   pass "Disabled plugin target exits successfully"
 else
   fail "Disabled plugin target exits successfully"
 fi
 expect_log_line "$disabled_home/mock.log" "plugin enable superpowers@claude-plugins-official --scope user" "Disabled plugin is enabled"
-expect_text "$disabled_home/output.log" "unchanged plugin github@claude-plugins-official" "Enabled plugin is left unchanged"
+expect_text "$disabled_home/output.log" "unchanged plugin plannotator@plannotator" "Enabled plugin is left unchanged"
 unset MOCK_PLUGIN_JSON
 
 failure_home="$TEST_ROOT/failure-home"
-MOCK_FAIL_MATCH='plugin install planboard@planboard'
+MOCK_FAIL_MATCH='plugin install plannotator@plannotator'
 if run_script "$failure_home" install.sh claude; then
   fail "Plugin failure returns nonzero"
 else
   pass "Plugin failure returns nonzero"
 fi
-expect_text "$failure_home/output.log" "retry: claude plugin install planboard@planboard --scope user" "Plugin failure prints exact retry"
+expect_text "$failure_home/output.log" "retry: claude plugin install plannotator@plannotator --scope user" "Plugin failure prints exact retry"
 unset MOCK_FAIL_MATCH
 
 unknown_home="$TEST_ROOT/unknown-home"

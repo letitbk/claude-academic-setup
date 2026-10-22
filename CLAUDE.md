@@ -47,3 +47,7 @@ For substantive analysis, capture output in `logs/YYYY-MM-DD_HH-MM-SS_<descripti
 - Write each prose paragraph as one continuous line and let the editor wrap it visually.
 - Insert newlines only between block elements such as paragraphs, headings, list items, tables, and code blocks.
 - Match an existing file that already uses hard wrapping unless the user asks to reflow it.
+
+## 8. Get an independent review
+
+For important plans or results, ask a different model for a review with `/codex` or `/agy`. Present its findings and wait for approval before changing files.
