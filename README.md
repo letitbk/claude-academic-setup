@@ -102,7 +102,7 @@ Some skills solve one research problem each, so they live in their own repositor
 
 | Repository | What it does |
 |---|---|
-| [journal-style](https://github.com/letitbk/journal-style) | Format and check figures and regression tables for ASR, AJS, Social Forces, Demography, and PNAS |
+| [journal-style](https://github.com/letitbk/journal-style) | Format and check regression tables and figures for 17 journals and venues in sociology, general science, economics, political science, public health, statistics, communication, and computer science, and add more |
 | [qualtrics-skills](https://github.com/letitbk/qualtrics-skills) | Build and edit Qualtrics surveys through the API, and test every route with scripted respondents before fielding |
 | [annotated-site](https://github.com/letitbk/annotated-site) | Make a password protected site where collaborators comment on your Markdown documents |
 | [dataverse-skills](https://github.com/letitbk/dataverse-skills) | Keep a replication package in Harvard Dataverse in step with your repository |

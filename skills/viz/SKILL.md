@@ -51,4 +51,4 @@ Unless the project sets other defaults, use R with ggplot2 and `theme_minimal(ba
 - Compare a few plotted values with the summary table they come from.
 - If a document embeds the figure, rebuild the figure, then render the document again. Check that the document shows the new version, that every saved figure is used, and that captions are not duplicated. In pandoc, leave the image alt text empty when a separate caption exists.
 
-Report the source data, the script, the output files, and the checks you ran. Use `journal-figures`, from the journal-style repository, when a finished figure must meet a journal's submission rules.
+Report the source data, the script, the output files, and the checks you ran. Use `journal-style`, from the journal-style repository, when a finished figure must meet a journal's submission rules.
