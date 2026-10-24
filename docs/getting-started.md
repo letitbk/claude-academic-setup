@@ -176,6 +176,18 @@ Estimate how parental education is associated with self rated health.
 
 A skill is a small instruction package for a recurring kind of task. Skills can trigger from an ordinary request, so you do not need to memorize slash commands.
 
+| Skill | Purpose | Installed for |
+|---|---|---|
+| `napkin` | Remember corrections and useful project specific lessons | Both |
+| `plain-writing` | Write clear prose with simple words and little filler | Both |
+| `datacheck` | Inspect a new data file before analysis | Both |
+| `viz` | Plan, create, and check a data visualization | Both |
+| `agy` | Ask Gemini, through the Antigravity CLI, for an independent review | Both |
+| `codex` | Ask Codex for an independent review from inside Claude Code | Claude Code |
+| `claude` | Ask Claude for an independent review from inside Codex | Codex |
+
+A review skill never runs inside the agent it calls, because the agent would be reviewing itself.
+
 A plugin can add skills, tools, hooks, or external services to Claude Code. Plugins are trusted code. Review the source before installing an unfamiliar plugin.
 
 The Claude setup installs:
@@ -184,6 +196,8 @@ The Claude setup installs:
 |---|---|
 | Superpowers | General planning, debugging, testing, and development discipline |
 | Plannotator | Review and annotate a plan or a diff in the browser before the agent continues |
+
+To use Plannotator, press Shift+Tab until Claude Code shows plan mode, then describe the task. When Claude finishes its plan, Plannotator opens the plan in your browser. Comment on any line, then approve the plan or send the comments back. Run `/plannotator-review` to annotate a diff in the same way.
 
 Plannotator needs the `plannotator` program. Install it with `curl -fsSL https://plannotator.ai/install.sh | bash` on macOS, Linux, or WSL.
 
@@ -289,7 +303,18 @@ Planboard can ask Codex to review work, but Claude Code must host the plugin. Re
 
 ## Add single purpose research skills when needed
 
-Research skills that solve one problem each live in their own repositories: journal-style, qualtrics-skills, annotated-site, and dataverse-skills. The README lists what each one does. Install only what a project needs, and install each skill's own dependencies, such as R packages or an API token, as its README describes. This setup does not change your R or Python environments.
+Research skills that solve one problem each live in their own repositories: journal-style, qualtrics-skills, annotated-site, and dataverse-skills. The README lists what each one does. Each repository works as a Claude Code plugin and as a set of Agent Skills for Codex and other agents.
+
+For Claude Code, install one with:
+
+```bash
+claude plugin marketplace add letitbk/<repository>
+claude plugin install <repository>@<repository> --scope user
+```
+
+For Codex, run `npx skills add letitbk/<repository> -g -a codex`.
+
+Install only what a project needs, and install each skill's own dependencies, such as R packages or an API token, as its README describes. This setup does not change your R or Python environments.
 
 ## Work on many projects at once
 
@@ -301,7 +326,7 @@ Once agents help with real research, you will run them on several projects, and 
 
 ### If you use one provider, use its desktop app
 
-The [Claude desktop app](https://claude.com/resources/articles/claude-code-desktop-redesign) lists every Claude Code session in a sidebar that you can group by project. Each session has a diff viewer, a file editor, an HTML and PDF preview pane, and a terminal. The [ChatGPT desktop app](https://learn.chatgpt.com/docs/app) lets you switch between ChatGPT and Codex and run projects in parallel. Both apps read the same skill folders that this installer writes. The installer needs the `claude` or `codex` command line tool. If you only have a desktop app, install the command line tool as described above, or copy the files with the PowerShell commands and their macOS or Linux equivalents.
+The [Claude desktop app](https://claude.com/resources/articles/claude-code-desktop-redesign) lists every Claude Code session in a sidebar that you can group by project. Each session has a diff viewer, a file editor, an HTML and PDF preview pane, and a terminal. It is available on the Pro, Max, Team, and Enterprise plans. The [ChatGPT desktop app](https://learn.chatgpt.com/docs/app) lets you switch between ChatGPT and Codex and run projects in parallel. Both apps read the same skill folders that this installer writes. The installer needs the `claude` or `codex` command line tool. If you only have a desktop app, install the command line tool as described above, or copy the files with the PowerShell commands and their macOS or Linux equivalents.
 
 ### If you are comfortable in a terminal, try Orca
 
@@ -324,7 +349,7 @@ With several agents open, it is easy to ask a second model to review a plan or a
 - In Claude Code, run `/codex` for a Codex review or `/agy` for a Gemini review.
 - In Codex, run `$claude` for a Claude review or `$agy` for a Gemini review.
 
-Each review skill reports its findings and stops. You choose which findings to act on.
+Each review skill reports its findings and stops. You choose which findings to act on. OpenAI also publishes an official [Codex plugin for Claude Code](https://github.com/openai/codex-plugin-cc) with `/codex:review` and `/codex:adversarial-review` commands, if you prefer a plugin to a skill.
 
 The `agy` skill starts the Antigravity CLI with `--dangerously-skip-permissions`. The Antigravity CLI cannot show a permission prompt when it runs from a script, so without the flag it stops at its first command. This is the one place in the setup that skips permission prompts. The review prompt asks only for text, but the flag does not enforce that. Commit or stash your work before a review, so that `git status` shows any change the reviewer makes.
 
@@ -347,7 +372,7 @@ claude plugin list
 find ~/.claude/skills -mindepth 1 -maxdepth 1 -type d
 ```
 
-Use Claude's `/plugin` screen to disable an old plugin before uninstalling it. Move a skill directory to a backup before deleting it. The current repository manifest in the README is the source of truth for what a fresh install includes.
+Use Claude's `/plugin` screen to disable an old plugin before uninstalling it. Move a skill directory to a backup before deleting it. The core skills table in this guide lists what a fresh install includes.
 
 Earlier versions of this repository installed Claude HUD, the GitHub plugin, and Planboard by default, and included a research skill bundle with survey, marginal effects, Qualtrics, and journal formatting skills. Planboard is now optional. The Qualtrics and journal skills moved to their own repositories. Your existing copies keep working until you remove them.
 
