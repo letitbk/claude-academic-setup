@@ -289,7 +289,7 @@ Planboard can ask Codex to review work, but Claude Code must host the plugin. Re
 
 ## Add single purpose research skills when needed
 
-Research skills that solve one problem each live in their own repositories: coauthor, journal-style, qualtrics-skills, annotated-site, and dataverse-skills. The README lists what each one does. Install only what a project needs, and install each skill's own dependencies, such as R packages or an API token, as its README describes. This setup does not change your R or Python environments.
+Research skills that solve one problem each live in their own repositories: journal-style, qualtrics-skills, annotated-site, and dataverse-skills. The README lists what each one does. Install only what a project needs, and install each skill's own dependencies, such as R packages or an API token, as its README describes. This setup does not change your R or Python environments.
 
 ## Work on many projects at once
 

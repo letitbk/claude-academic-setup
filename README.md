@@ -157,7 +157,6 @@ Some skills solve one research problem each, so they live in their own repositor
 
 | Repository | What it does |
 |---|---|
-| [coauthor](https://github.com/letitbk/coauthor) | Write or revise a paper one paragraph at a time, keep a record of who wrote which words, and edit with strict checks that facts and numbers are kept |
 | [journal-style](https://github.com/letitbk/journal-style) | Format and check figures and regression tables for ASR, AJS, Social Forces, Demography, and PNAS |
 | [qualtrics-skills](https://github.com/letitbk/qualtrics-skills) | Build and edit Qualtrics surveys through the API, and test every route with scripted respondents before fielding |
 | [annotated-site](https://github.com/letitbk/annotated-site) | Make a password protected site where collaborators comment on your Markdown documents |
