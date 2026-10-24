@@ -107,8 +107,6 @@ Some skills solve one research problem each, so they live in their own repositor
 | [annotated-site](https://github.com/letitbk/annotated-site) | Make a password protected site where collaborators comment on your Markdown documents |
 | [dataverse-skills](https://github.com/letitbk/dataverse-skills) | Keep a replication package in Harvard Dataverse in step with your repository |
 
-These repositories are private for now while I prepare them for public release.
-
 ## License and credits
 
 This repository is MIT licensed. See [LICENSE](LICENSE).
