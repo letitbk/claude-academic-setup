@@ -19,7 +19,7 @@ expect_equal() {
 }
 
 expected_skills=$(printf '%s\n' \
-  agy claude codex datacheck napkin plain-writing viz | sort)
+  agy claude codex datacheck hallucinator napkin plain-writing viz | sort)
 actual_skills=$(find "$ROOT/skills" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort)
 expect_equal "skill manifest" "$expected_skills" "$actual_skills"
 
@@ -127,6 +127,12 @@ if rg -n 'gemini' "$ROOT/skills/agy/SKILL.md" >/dev/null; then
   fail "agy skill does not point to an unshipped /gemini skill"
 else
   pass "agy skill does not point to an unshipped /gemini skill"
+fi
+
+if sed -n '/^COMMON_SKILLS=(/,/^CLAUDE_PLUGINS=(/p' "$ROOT/install.sh" | rg -q hallucinator; then
+  fail "hallucinator stays optional"
+else
+  pass "hallucinator stays optional"
 fi
 
 if [ "$FAILURES" -gt 0 ]; then

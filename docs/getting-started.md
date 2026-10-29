@@ -203,6 +203,33 @@ Plannotator needs the `plannotator` program. Install it with `curl -fsSL https:/
 
 Use `/plugin` in Claude Code to inspect, update, disable, or uninstall plugins.
 
+### Optional skills and plugins
+
+The installer does not add these. Add one when your work needs it.
+
+`hallucinator` checks whether the references in a PDF, `.bib`, or `.bbl` file are real. It looks each one up in CrossRef, arXiv, DBLP, PubMed, OpenAlex, and other databases, and reports references that it cannot find, that list different authors, or that were retracted. A reference it cannot find is a reason to check by hand, not proof that the agent made it up. The skill is in this repository. Copy it for each agent you use, then install the `hallucinator-cli` program it calls:
+
+```bash
+cp -R skills/hallucinator ~/.claude/skills/
+cp -R skills/hallucinator ~/.codex/skills/
+curl -sSf https://hallucinator.science/install-cli.sh | sh
+```
+
+An `OPENALEX_KEY` or a Semantic Scholar `S2_API_KEY` adds more databases. The [hallucinator project](https://github.com/gianlucasb/hallucinator) explains both keys.
+
+To read, create, or edit PDF and Word files, use the document skills from each agent's maker:
+
+- For Claude Code, install Anthropic's [document skills](https://github.com/anthropics/skills), which cover PDF, Word, Excel, and PowerPoint files:
+
+  ```bash
+  claude plugin marketplace add anthropics/skills
+  claude plugin install document-skills@anthropic-agent-skills --scope user
+  ```
+
+- For Codex, recent versions include the `pdf` and `documents` plugins. Run `codex plugin list` and check that both show as installed and enabled. If they do not, update Codex.
+
+The setup installs [Superpowers](https://github.com/obra/superpowers) for Claude Code only. Codex users can add it from the [Codex plugin marketplace](https://github.com/openai/plugins/tree/main/plugins/superpowers). In Codex, type `/plugins`, search for `superpowers`, and select Install Plugin. You can also run `codex plugin add superpowers@openai-curated-remote` from a terminal.
+
 ## Permissions and sandboxing
 
 Permissions decide which tools the agent may use. Sandboxing limits what Bash commands can reach on the filesystem and network. They are separate safety layers.

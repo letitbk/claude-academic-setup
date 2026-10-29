@@ -80,6 +80,17 @@ My answer is the `datacheck` and `viz` skills. I built both from the mistakes re
 
 The installer does not install Claude Code, Codex, the Antigravity CLI, Orca, Planboard, R, or Python packages. You stay in control of those choices.
 
+### Optional additions
+
+The installer leaves these out. The [guide](docs/getting-started.md#optional-skills-and-plugins) shows how to add each one.
+
+| Addition | What it does | Where it comes from |
+|---|---|---|
+| `hallucinator` skill | Checks that the references in a PDF or bibliography exist, with the right authors, and were not retracted | This repository, plus the [hallucinator](https://github.com/gianlucasb/hallucinator) command line tool |
+| Document skills for Claude Code | Read, create, and edit PDF, Word, Excel, and PowerPoint files | Anthropic's [skills repository](https://github.com/anthropics/skills) |
+| Document plugins for Codex | Read, create, and edit PDF and Word files | The `pdf` and `documents` plugins that come with recent Codex versions |
+| Superpowers for Codex | The same planning and development skills that the setup installs for Claude Code | The [Codex plugin marketplace](https://github.com/openai/plugins/tree/main/plugins/superpowers) |
+
 ## Get started
 
 You need Claude Code or Codex, Git, and Python 3. Clone this repository and choose one target:
@@ -111,4 +122,4 @@ Some skills solve one research problem each, so they live in their own repositor
 
 This repository is MIT licensed. See [LICENSE](LICENSE).
 
-The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Superpowers, Plannotator, Planboard, Codex, the Antigravity CLI, and Orca are separate projects with their own licenses and terms.
+The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Superpowers, Plannotator, Planboard, Codex, the Antigravity CLI, Orca, hallucinator, and Anthropic's document skills are separate projects with their own licenses and terms.
