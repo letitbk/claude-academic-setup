@@ -73,19 +73,19 @@ Use AskUserQuestion to clarify **what** to review:
 
 ### Step 2: Choose Model
 
-Default: **`Gemini 3.1 Pro (High)`** (deepest reasoning). Offer the menu from `agy models`:
+Default: **`Gemini 4 Argon (High)`** (deepest reasoning). Offer the menu from `agy models`:
 
 | Model string (pass verbatim to `--model`) | Best for | Speed |
 |--------------------------------------------|----------|-------|
-| `Gemini 3.1 Pro (High)` | Thorough reviews, complex reasoning (default) | Slower |
-| `Gemini 3.1 Pro (Low)` | Balanced depth vs speed | Medium |
-| `Gemini 3.5 Flash (High)` | Fast incremental reviews | Fast |
-| `Gemini 3.5 Flash (Medium)` / `(Low)` | Quick sanity checks | Fastest |
-| `Claude Opus 4.6 (Thinking)` | Different-family cross-check (still Claude) | Slower |
-| `Claude Sonnet 4.6 (Thinking)` | Cheaper Claude cross-check | Medium |
+| `Gemini 4 Argon (High)` | Thorough reviews, complex reasoning (default) | Slower |
+| `Gemini 4 Argon (Low)` | Balanced depth vs speed | Medium |
+| `Gemini 3.8 Flash (High)` | Fast incremental reviews | Fast |
+| `Gemini 3.8 Flash (Medium)` / `(Low)` | Quick sanity checks | Fastest |
+| `Claude Opus 5.5 (High)` | Different-family cross-check (still Claude) | Slower |
+| `Claude Sonnet 5.5 (High)` | Cheaper Claude cross-check | Medium |
 | `GPT-OSS 120B (Medium)` | Open-weight perspective | Medium |
 
-> Always re-run `agy models` if a model string is rejected — the exact display names can change between CLI versions. Pass the string **verbatim**, including the parenthetical (e.g. `--model "Gemini 3.1 Pro (High)"`).
+> Always re-run `agy models` if a model string is rejected — the exact display names can change between CLI versions. Pass the string **verbatim**, including the parenthetical (e.g. `--model "Gemini 4 Argon (High)"`).
 
 ### Step 3: Build the Prompt
 
@@ -116,7 +116,7 @@ agy --dangerously-skip-permissions --model "MODEL" --print-timeout 20m \
 
 ## Execution Modes
 
-Each mode is the same base command with a different **scope instruction** prepended to the XML prompt. `MODEL` defaults to `Gemini 3.1 Pro (High)`.
+Each mode is the same base command with a different **scope instruction** prepended to the XML prompt. `MODEL` defaults to `Gemini 4 Argon (High)`.
 
 ### Mode 1: Review Uncommitted Changes
 ```bash
@@ -274,25 +274,25 @@ Every command appends `< /dev/null`. Do not omit it.
 
 ```bash
 # Review uncommitted changes (default model)
-agy --dangerously-skip-permissions --model "Gemini 3.1 Pro (High)" --print-timeout 20m \
+agy --dangerously-skip-permissions --model "Gemini 4 Argon (High)" --print-timeout 20m \
   -p "Run git diff and git diff --staged in this repo, then review the changes. <template>" \
   < /dev/null > agy_review_$(date +%Y%m%d_%H%M%S).md
 
 # Faster pass with Flash
-agy --dangerously-skip-permissions --model "Gemini 3.5 Flash (High)" --print-timeout 10m \
+agy --dangerously-skip-permissions --model "Gemini 3.8 Flash (High)" --print-timeout 10m \
   -p "Run git diff in this repo, then review. <template>" < /dev/null > agy_review.md
 
 # Review against main
-agy --dangerously-skip-permissions --model "Gemini 3.1 Pro (High)" --print-timeout 20m \
+agy --dangerously-skip-permissions --model "Gemini 4 Argon (High)" --print-timeout 20m \
   -p "Run git diff main...HEAD, then review the branch changes. <template>" \
   < /dev/null > agy_review.md
 
 # Add an extra directory to the workspace
-agy --dangerously-skip-permissions --add-dir /path/to/other --model "Gemini 3.1 Pro (High)" \
+agy --dangerously-skip-permissions --add-dir /path/to/other --model "Gemini 4 Argon (High)" \
   -p "<prompt referencing files in both dirs>" < /dev/null > agy_review.md
 
 # Cross-model second opinion
-agy --dangerously-skip-permissions --model "Claude Opus 4.6 (Thinking)" --print-timeout 20m \
+agy --dangerously-skip-permissions --model "Claude Opus 5.5 (High)" --print-timeout 20m \
   -p "<plan evaluation template>" < /dev/null > agy_review.md
 ```
 
@@ -303,10 +303,10 @@ agy --dangerously-skip-permissions --model "Claude Opus 4.6 (Thinking)" --print-
 User: /agy — review my changes before I commit
 
 Claude asks: Scope? Model?
-User: Uncommitted changes, Gemini 3.1 Pro (High)
+User: Uncommitted changes, Gemini 4 Argon (High)
 
 Claude runs (from the repo):
-agy --dangerously-skip-permissions --model "Gemini 3.1 Pro (High)" --print-timeout 20m \
+agy --dangerously-skip-permissions --model "Gemini 4 Argon (High)" --print-timeout 20m \
   -p "Run git status, git diff, and git diff --staged in this repo, then review the changes. <code review template>" \
   < /dev/null > agy_review_20260623_150000.md
 
@@ -318,7 +318,7 @@ Reports findings. STOPS. Asks the user what to fix.
 User: review my feature branch against main with Gemini
 
 Claude runs:
-agy --dangerously-skip-permissions --model "Gemini 3.1 Pro (High)" --print-timeout 20m \
+agy --dangerously-skip-permissions --model "Gemini 4 Argon (High)" --print-timeout 20m \
   -p "Run git diff main...HEAD in this repo, then review the branch changes. <code review template>" \
   < /dev/null > agy_review_feature.md
 
@@ -330,10 +330,10 @@ Reports findings. STOPS.
 User: /agy — evaluate my auth plan, focus on security
 
 Claude asks: Model?
-User: Gemini 3.1 Pro (High)
+User: Gemini 4 Argon (High)
 
 Claude runs:
-agy --dangerously-skip-permissions --model "Gemini 3.1 Pro (High)" --print-timeout 20m \
+agy --dangerously-skip-permissions --model "Gemini 4 Argon (High)" --print-timeout 20m \
   -p "Explore the relevant parts of this repo to ground your assessment. <plan evaluation template, plan pasted in, focus areas: security>" \
   < /dev/null > agy_review_20260623_150000.md
 
@@ -356,9 +356,9 @@ Options:
 
 Question 2: "Which model should I use?"
 Options:
-- Gemini 3.1 Pro (High) — thorough (default)
-- Gemini 3.5 Flash (High) — fast
-- Claude Opus 4.6 (Thinking) — different-family cross-check
+- Gemini 4 Argon (High) — thorough (default)
+- Gemini 3.8 Flash (High) — fast
+- Claude Opus 5.5 (High) — different-family cross-check
 - (other from `agy models`)
 ```
 
@@ -380,7 +380,7 @@ Options:
 `agy` doesn't require a git repo at all (there is no `--skip-git-repo-check` flag because none is needed). To review code that isn't under version control — or to review loose files — skip the git-scope instruction and point `agy` at the files directly with `--add-dir`:
 
 ```bash
-agy --dangerously-skip-permissions --add-dir /path/to/code --model "Gemini 3.1 Pro (High)" --print-timeout 20m \
+agy --dangerously-skip-permissions --add-dir /path/to/code --model "Gemini 4 Argon (High)" --print-timeout 20m \
   -p "Read these files: /path/to/code/a.py, /path/to/code/b.py. Then review them. <code review template>" \
   < /dev/null > agy_review.md
 ```
@@ -390,7 +390,7 @@ agy --dangerously-skip-permissions --add-dir /path/to/code --model "Gemini 3.1 P
 1. **Use the XML templates** — structured prompts beat bare instructions.
 2. **Name the git scope** — tell agy the exact `git` command to run; it won't infer your intent.
 3. **One task per run** — never mix review + fix + docs.
-4. **Default to Gemini 3.1 Pro (High)** for depth; drop to Flash for quick incremental passes.
+4. **Default to Gemini 4 Argon (High)** for depth; drop to Flash for quick incremental passes.
 5. **Always `< /dev/null`** and a generous `--print-timeout`.
 6. **Run from the repo directory** so agy's git/file tools resolve paths correctly.
 7. **For a true outside opinion**, prefer the Gemini models over the Claude options (Claude Code is already Claude).
