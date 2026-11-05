@@ -35,15 +35,13 @@ Writing a detailed plan by hand takes a long time. When I tell an agent exactly 
 
 My answer is to say what I want and why, and to leave out how. The reason is the most useful context I can give. When the agent knows the reason, it can choose sensible defaults and notice when a request does not fit the goal. Then the agent and I work out how together. In the instruction file, I ask the agent to state its assumptions and to ask before it guesses. In Claude Code, the agent asks through its question tool, which shows a few options to pick from, so I can answer quickly. I name the tool, `AskUserQuestion`, in the instruction file and say to load it through `ToolSearch`, because an agent stopped using it in one of my sessions in March 2026. For Codex, I name `request_user_input`. Here's one example request:
 
-```text
-I want to examine how social isolation relates to self-rated health during the COVID-19 pandemic, using the survey data in @data/rawdata.
-
-Past research links social isolation to poorer mental health. The pandemic may differ, because social distancing was also a privilege. Essential workers often could not isolate, and people who did isolate could stay connected through Zoom. So isolation may not always have harmed health.
-
-The data are longitudinal (see the survey date variable), so we can see how these relationships changed over the pandemic. The data also describe people's discussion networks: whom they talked to about important matters, which channels they used, and whether they stayed at home. These measures may help us separate physical isolation from social connection, and test whether some kinds of contact moderated the link between isolation and health.
-
-Read the codebook in @data/rawdata and explore the data to find the relevant variables. Before you write the research plan, ask me about any substantive or methodological decisions that need my input.
-```
+> I want to examine how social isolation relates to self-rated health during the COVID-19 pandemic, using the survey data in `@data/rawdata`.
+>
+> Past research links social isolation to poorer mental health. The pandemic may differ, because social distancing was also a privilege. Essential workers often could not isolate, and people who did isolate could stay connected through Zoom. So isolation may not always have harmed health.
+>
+> The data are longitudinal (see the survey date variable), so we can see how these relationships changed over the pandemic. The data also describe people's discussion networks: whom they talked to about important matters, which channels they used, and whether they stayed at home. These measures may help us separate physical isolation from social connection, and test whether some kinds of contact moderated the link between isolation and health.
+>
+> Read the codebook in `@data/rawdata` and explore the data to find the relevant variables. Before you write the research plan, ask me about any substantive or methodological decisions that need my input.
 
 ### 4. Agents write text that is hard to read
 
