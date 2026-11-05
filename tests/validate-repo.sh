@@ -82,14 +82,20 @@ actual_plugins=$(sed -n '/^CLAUDE_PLUGINS=(/,/^)/p' "$ROOT/install.sh" 2>/dev/nu
   | sed -n 's/^[[:space:]]*"\([^"]*\)"[[:space:]]*$/\1/p' | sort)
 expect_equal "plugin manifest" "$expected_plugins" "$actual_plugins"
 
-# Section 8 names each agent's own reviewers, so compare the shared sections only.
-if diff -u <(sed -n '2,/^## 8\./p' "$ROOT/CLAUDE.md") <(sed -n '2,/^## 8\./p' "$ROOT/AGENTS.md") >/dev/null; then
-  pass "instruction bodies match"
+# Each file names its own tools, so compare the section headings only.
+if diff -u <(rg '^## ' "$ROOT/CLAUDE.md") <(rg '^## ' "$ROOT/AGENTS.md") >/dev/null; then
+  pass "instruction headings match"
 else
-  fail "instruction bodies match"
+  fail "instruction headings match"
 fi
 expect_equal "Claude template names its reviewers" "1" "$(rg -c '/codex. or ./agy' "$ROOT/CLAUDE.md")"
 expect_equal "Codex template names its reviewers" "1" "$(rg -c '[$]claude. or .[$]agy' "$ROOT/AGENTS.md")"
+expect_equal "Claude template names its question tool" "1" "$(rg -c 'AskUserQuestion' "$ROOT/CLAUDE.md")"
+expect_equal "Codex template names its question tool" "1" "$(rg -c 'request_user_input' "$ROOT/AGENTS.md")"
+for template in CLAUDE.md AGENTS.md; do
+  expect_equal "$template keeps the Git rules" "3" \
+    "$(rg -c 'Inspect status and diffs|Do not discard work|Co-Authored-By' "$ROOT/$template")"
+done
 
 if rg -n '/Users/bk|/Users/[^ ]+' "$ROOT/skills" -g '*.md' -g '*.py' -g '*.R' -g '*.yaml' >/dev/null; then
   fail "retained skills contain no private absolute paths"

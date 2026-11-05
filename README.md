@@ -33,12 +33,16 @@ Each review skill reports its findings and stops. You decide what to fix. In the
 
 Writing a detailed plan by hand takes a long time. When I tell an agent exactly how to do each step, it follows the steps even where they do not fit the data, because it does not know what the steps are for.
 
-My answer is to say what I want and why, and to leave out how. The reason is the most useful context I can give. When the agent knows the reason, it can choose sensible defaults and notice when a request does not fit the goal. Then the agent and I work out how together. In the instruction file, I ask the agent to state its assumptions and to ask before it guesses. In Claude Code, the agent asks through its question tool, which shows a few options to pick from. A request can be as short as this:
+My answer is to say what I want and why, and to leave out how. The reason is the most useful context I can give. When the agent knows the reason, it can choose sensible defaults and notice when a request does not fit the goal. Then the agent and I work out how together. In the instruction file, I ask the agent to state its assumptions and to ask before it guesses. In Claude Code, the agent asks through its question tool, which shows a few options to pick from, so I can answer quickly. I name the tool, `AskUserQuestion`, in the instruction file and say to load it through `ToolSearch`, because an agent stopped using it in one of my sessions in March 2026. For Codex, I name `request_user_input`. Here's one example request:
 
 ```text
-I want a figure that compares self rated health across education groups.
-It is for a talk to a general audience, who need to see the gap at a glance.
-Ask me about anything you need to decide before you write the plan.
+I want to examine how social isolation relates to self-rated health during the COVID-19 pandemic, using the survey data in @data/rawdata.
+
+Past research links social isolation to poorer mental health. The pandemic may differ, because social distancing was also a privilege. Essential workers often could not isolate, and people who did isolate could stay connected through Zoom. So isolation may not always have harmed health.
+
+The data are longitudinal (see the survey date variable), so we can see how these relationships changed over the pandemic. The data also describe people's discussion networks: whom they talked to about important matters, which channels they used, and whether they stayed at home. These measures may help us separate physical isolation from social connection, and test whether some kinds of contact moderated the link between isolation and health.
+
+Read the codebook in @data/rawdata and explore the data to find the relevant variables. Before you write the research plan, ask me about any substantive or methodological decisions that need my input.
 ```
 
 ### 4. Agents write text that is hard to read
@@ -65,11 +69,33 @@ Agents load a file and start the analysis without checking what one row is, how 
 
 My answer is the `datacheck` and `viz` skills. I built both from the mistakes recorded in about 80 project napkins. `datacheck` inspects a data file before analysis and again after each merge or filter. `viz` plans a figure and checks the exported file, not the plot on screen.
 
+### 8. Did the agent run the analysis, or make up the result?
+
+An agent can report a coefficient or a count that no code produced, and the sentence reads the same as a real result. I kept having to ask agents, "did you run all these models?"
+
+My answer is the Reproducible Evidence section of the instruction file. I added it in March 2026 so that I would have a record that the agent analyzed the data and did not make up the result. For a substantive analysis, the agent saves the output with `tee` to a dated file in `logs/`, e.g., `logs/2026-03-08_14-30-00_main-models.log`. The agent must not report a result unless a log, notebook output, or test report shows that the code ran. One-liners and quick checks do not need a log. The `logs/` folder stays in `.gitignore`, so logs stay out of the repository.
+
+With a log, I can see that the code ran and what the code printed. A log cannot show that the analysis is correct, so I still check the results as problems 1 and 2 describe.
+
+### 9. Agents do more than I asked
+
+Agents add things I did not ask for, and they change things that have nothing to do with the task. In one project, I asked an agent to check three pages, and it added a new analysis of individual users. Extra work like this is more for me to review, and I may not notice it.
+
+My answer is the Simplicity First and Surgical Changes sections of the instruction file. I adapted them, with Think Before Coding, from a [set of guidelines](https://github.com/forrestchang/andrej-karpathy-skills) based on Andrej Karpathy's description of common mistakes that coding agents make. With Simplicity First, the agent builds only what the task needs. With Surgical Changes, the agent leaves alone any code I did not ask it to change. It also matches the existing style and removes only what its own changes left unused. When the agent changes less, I can read every change.
+
+The Git section adds two lines for the same reason. The agent looks at the Git status and diffs before it changes or commits files, and it does not discard work it did not create. I often run several agents on one project, so uncommitted work in a folder may be mine or another agent's.
+
+### 10. Agents break lines in the middle of a sentence
+
+When agents write Markdown or other prose, they break each paragraph into short lines at a fixed width. I had to ask agents to fix these line breaks each time, in one project after another.
+
+My answer is the Prose & Markdown Line Breaks section of the instruction file. The agent writes each paragraph as one continuous line, and the editor wraps it on screen. The agent adds a newline only between blocks, e.g., between two paragraphs. There are two exceptions. Commit message bodies wrap at about 72 characters. A file that is already hard wrapped stays that way unless I agree to change it.
+
 ## What the installer adds
 
 | Part | Problem it addresses | Installed for |
 |---|---|---|
-| Global `CLAUDE.md` or `AGENTS.md` | Ask before guessing (3) and get an independent review (2) | Each agent |
+| Global `CLAUDE.md` or `AGENTS.md` | Independent review (2), asking before guessing (3), evidence that code ran (8), small changes (9), and line breaks (10) | Each agent |
 | Plannotator plugin | Review a plan before work starts (1) | Claude Code |
 | Superpowers plugin | Brainstorming and planning before work starts (1, 3) | Claude Code |
 | `codex`, `agy`, and `claude` skills | Cross model review (2) | `codex` in Claude Code, `claude` in Codex, `agy` in both |
@@ -79,6 +105,21 @@ My answer is the `datacheck` and `viz` skills. I built both from the mistakes re
 | Starter `settings.json` | Permission prompts, a Bash sandbox, and deny rules for destructive commands | Claude Code |
 
 The installer does not install Claude Code, Codex, the Antigravity CLI, Orca, Planboard, R, or Python packages. You stay in control of those choices.
+
+### The eight sections of the instruction file
+
+`CLAUDE.md` and `AGENTS.md` are the files I use myself, so some rules reflect my own preferences. Change any rule that does not suit your work. The two files have the same sections, and each one names its own agent's tools.
+
+| Section | What it asks the agent to do | Why |
+|---|---|---|
+| 1. Use Skills When Relevant | Use the matching skill first, and ask through the question tool | Problems 3, 4, 5, and 7 |
+| 2. Think Before Coding | State assumptions and ask when unsure | Problem 3 |
+| 3. Simplicity First | Build only what the task needs | Problem 9 |
+| 4. Surgical Changes | Change only what the task needs | Problem 9 |
+| 5. Reproducible Evidence | Save the output and report only what ran | Problem 8 |
+| 6. Git | Check the Git status first, and keep work it did not create | Problem 9 |
+| 7. Prose & Markdown Line Breaks | Write each paragraph as one line | Problem 10 |
+| 8. Independent Review | Get a review from a different model for important plans and results | Problem 2 |
 
 ### Optional additions
 
@@ -122,4 +163,4 @@ Some skills solve one research problem each, so they live in their own repositor
 
 This repository is MIT licensed. See [LICENSE](LICENSE).
 
-The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Superpowers, Plannotator, Planboard, Codex, the Antigravity CLI, Orca, hallucinator, and Anthropic's document skills are separate projects with their own licenses and terms.
+The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Sections 2 to 4 of the instruction files adapt the MIT licensed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) guidelines. Superpowers, Plannotator, Planboard, Codex, the Antigravity CLI, Orca, hallucinator, and Anthropic's document skills are separate projects with their own licenses and terms.

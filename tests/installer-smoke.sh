@@ -205,7 +205,7 @@ else
   fail "Instruction merge exits successfully"
 fi
 expect_text "$instructions_home/.claude/CLAUDE.md" "Keep my custom wording." "Instruction merge keeps existing section"
-expect_text "$instructions_home/.claude/CLAUDE.md" "## 7. Write prose without hard wrapping" "Instruction merge adds missing sections"
+expect_text "$instructions_home/.claude/CLAUDE.md" "## 7. Prose & Markdown Line Breaks" "Instruction merge adds missing sections"
 heading_count="$(rg -c '^## 1\.' "$instructions_home/.claude/CLAUDE.md")"
 if [ "$heading_count" = "1" ]; then pass "Instruction merge avoids duplicate headings"; else fail "Instruction merge avoids duplicate headings"; fi
 

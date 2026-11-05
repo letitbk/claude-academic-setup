@@ -150,7 +150,7 @@ Claude Code reads `CLAUDE.md`. Codex reads `AGENTS.md`. Both support a global fi
 | Global | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` |
 | Project | `CLAUDE.md` in the repository | `AGENTS.md` in the repository |
 
-Keep global rules general. Put the research question, data sources, analysis conventions, and project commands in the project file.
+Keep global rules general. Put the research question, data sources, analysis conventions, and project commands in the project file. The [README](../README.md#the-eight-sections-of-the-instruction-file) explains what each section of the global file is for.
 
 A useful project file is short:
 
