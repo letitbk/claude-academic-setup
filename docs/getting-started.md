@@ -6,6 +6,8 @@ This guide explains the setup in this repository. It assumes that you are comfor
 
 Both agents can read a repository, edit files, run programs, and inspect the result. Choose Claude Code if you already use Claude. Choose Codex if you already use ChatGPT or prefer Codex as your main terminal agent. Choose both if you want one model to review the work of the other.
 
+You need an account with each agent's maker. Claude Code needs a paid plan, starting with [Claude Pro](https://claude.com/pricing). Codex comes with [ChatGPT plans](https://chatgpt.com/pricing), and the Free plan has limited access. [Which models and agents to use](models-and-plans.md) compares plans and explains which models I use.
+
 The optional Planboard workflow is a Claude Code plugin. A Codex only setup still supports ordinary coding and research work, but it cannot host Planboard.
 
 ## Install the agent itself
@@ -97,8 +99,10 @@ The installer never silently overwrites a different file.
 For instruction files, you can:
 
 - keep the existing file;
-- append only template sections whose `##` heading is missing;
+- append only template sections whose number or `##` heading is missing;
 - back up the existing file and replace it.
+
+If you installed an earlier version, merging keeps your older wording for every numbered section you already have. Choose replace to take the new text.
 
 For Claude settings, you can:
 
@@ -139,6 +143,39 @@ Implement the approved change. Run the smallest relevant check and show me the d
 
 Read the diff. Keep the change only if you understand it. Git gives you a checkpoint, but it does not replace review.
 
+## Choose a model for each step
+
+Use your most advanced model to brainstorm, plan, and review. Use a cheaper model to carry out a plan you have approved. [Which models and agents to use](models-and-plans.md) explains why.
+
+In Claude Code, type these commands in a session:
+
+```text
+/model
+/model opus
+/model opusplan
+/effort high
+```
+
+The first command opens a picker. In the picker, press Enter to save a model as your default, or `s` to use it for this session only. The second command switches to Opus now. The third uses Opus in plan mode and Sonnet after you approve the plan. The fourth makes the current model reason for longer on a harder task.
+
+In Codex, type `/model` to pick a model and a reasoning level, or start a session with `codex -m gpt-6-astra`. The list depends on your plan.
+
+### Hand a plan to another agent
+
+Because a plan is a file, one agent can write it and another can carry it out. Claude Code keeps plans from plan mode in its own folder, so first ask for a copy in the project:
+
+```text
+Save the approved plan to docs/plan.md.
+```
+
+Then start the other agent in the same project:
+
+```text
+Read docs/plan.md. Carry out step 1 only, run the smallest relevant check, and show me the diff.
+```
+
+When the work is done, ask the first agent to check the result against the plan. Run one agent at a time in a folder, or give each agent its own worktree, so that they do not edit the same files.
+
 ## Instruction files are durable context
 
 An agent does not remember every past session. Instruction files provide stable rules that load when a session starts.
@@ -150,7 +187,7 @@ Claude Code reads `CLAUDE.md`. Codex reads `AGENTS.md`. Both support a global fi
 | Global | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` |
 | Project | `CLAUDE.md` in the repository | `AGENTS.md` in the repository |
 
-Keep global rules general. Put the research question, data sources, analysis conventions, and project commands in the project file. The [README](../README.md#the-eight-sections-of-the-instruction-file) explains what each section of the global file is for.
+Keep global rules general. Put the research question, data sources, analysis conventions, and project commands in the project file. [Why this setup exists](why-this-setup.md#the-eight-sections-of-the-instruction-file) explains what each section of the global file is for.
 
 A useful project file is short:
 
@@ -299,6 +336,23 @@ git commit -m "Describe the completed change"
 
 Do not ask an agent to force push or erase uncommitted work unless you understand exactly what will be lost.
 
+## Keep evidence that the code ran
+
+The instruction files ask the agent to save the output of each substantive analysis. Set this up once in each project:
+
+```bash
+mkdir -p logs
+echo "logs/" >> .gitignore
+```
+
+A run then looks like this:
+
+```bash
+Rscript analysis.R 2>&1 | tee "logs/$(date +%Y-%m-%d_%H-%M-%S)_main-models.log"
+```
+
+Open the log before you accept a number that the agent reports. The log shows that the code ran and what it printed. It does not show that the analysis is correct.
+
 ## Manage long sessions
 
 Start a new session when the task changes substantially. Keep durable facts in project instructions or project documentation instead of relying on chat history.
@@ -415,6 +469,7 @@ Earlier versions of this repository installed Claude HUD, the GitHub plugin, and
 | A skill appears twice in Codex | Keep it in only one of `~/.codex/skills` and `~/.agents/skills` |
 | Sandbox unavailable | Use WSL on Windows, or follow the Claude sandbox troubleshooting guide |
 | Skill does not trigger | Restart the agent and ask for the task in ordinary language or invoke the skill explicitly |
+| You hit a usage limit | Switch to a cheaper model with `/model`, or hand the plan to your other agent |
 | Existing settings behave differently | Your existing values win when you choose merge; inspect them with `/permissions` |
 
 Useful diagnostics:
@@ -433,10 +488,13 @@ git status
 - [Claude Code permissions](https://code.claude.com/docs/en/permissions)
 - [Claude Code settings](https://code.claude.com/docs/en/settings)
 - [Claude Code plugins](https://code.claude.com/docs/en/discover-plugins)
+- [Claude Code models](https://code.claude.com/docs/en/model-config)
 - [Codex CLI](https://developers.openai.com/codex/cli/)
+- [Codex models](https://developers.openai.com/codex/models)
 - [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md/)
 - [Codex skills](https://learn.chatgpt.com/docs/build-skills)
 - [Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli)
+- [Antigravity plans](https://antigravity.google/docs/plans)
 - [Plannotator](https://github.com/backnotprop/plannotator)
 - [Planboard](https://github.com/letitbk/planboard)
 - [Orca](https://github.com/stablyai/orca)
