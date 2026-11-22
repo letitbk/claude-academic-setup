@@ -1,0 +1,39 @@
+# Saves GitHub traffic counts every week, because GitHub keeps them for only 14 days.
+# Needs a repository secret named TRAFFIC_TOKEN: a fine-grained personal access token
+# with "Administration: Read-only" on this repository. The built-in GITHUB_TOKEN
+# cannot read traffic.
+name: Save traffic counts
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays at 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: traffic
+
+jobs:
+  traffic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Save counts and update README
+        env:
+          TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: python3 .github/scripts/traffic.py
+
+      - name: Commit if anything changed
+        run: |
+          git add .github/traffic README.md
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update traffic counts"
+          git push

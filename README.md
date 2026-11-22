@@ -85,3 +85,17 @@ Some skills solve one research problem each, so they live in their own repositor
 This repository is MIT licensed. See [LICENSE](LICENSE).
 
 The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Sections 2 to 4 of the instruction files adapt the MIT licensed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) guidelines. Superpowers, Plannotator, Planboard, Codex, Orca, hallucinator, and Anthropic's document skills are separate projects with their own licenses and terms.
+
+## How many people use this setup
+
+GitHub keeps traffic counts for only 14 days, so a weekly GitHub Action saves them in [.github/traffic](.github/traffic) and updates the table below. The unique column adds up GitHub's daily counts of unique visitors and cloners, so a person who comes back on another day counts again.
+
+<!-- traffic:start -->
+Counts from 2026-11-08 to 2026-11-21:
+
+| | Total | Unique |
+|---|---|---|
+| Views | 106 | 57 |
+| Clones | 84 | 49 |
+
+<!-- traffic:end -->
