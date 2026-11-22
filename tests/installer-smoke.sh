@@ -107,7 +107,7 @@ else
 fi
 expect_file "$claude_home/.claude/CLAUDE.md" "Claude instructions installed"
 expect_file "$claude_home/.claude/settings.json" "Claude settings installed"
-expect_skill_count "$claude_home/.claude/skills" 6 "Claude core skill manifest"
+expect_skill_count "$claude_home/.claude/skills" 5 "Claude core skill manifest"
 expect_dir "$claude_home/.claude/skills/codex" "Claude target installs /codex"
 expect_absent "$claude_home/.claude/skills/claude" "Claude target skips the Codex-only reviewer"
 expect_absent "$claude_home/.codex" "Claude target leaves Codex untouched"
@@ -133,7 +133,7 @@ else
   fail "Codex target exits successfully"
 fi
 expect_file "$codex_home/.codex/AGENTS.md" "Codex instructions installed"
-expect_skill_count "$codex_home/.codex/skills" 6 "Codex core skill manifest"
+expect_skill_count "$codex_home/.codex/skills" 5 "Codex core skill manifest"
 expect_dir "$codex_home/.codex/skills/claude" "Codex target installs the Claude reviewer"
 expect_absent "$codex_home/.codex/skills/codex" "Codex target skips /codex"
 expect_absent "$codex_home/.claude" "Codex target leaves Claude untouched"
@@ -144,8 +144,8 @@ if run_script "$both_home" install.sh both; then
 else
   fail "Both target exits successfully"
 fi
-expect_skill_count "$both_home/.claude/skills" 6 "Both target installs Claude core skills"
-expect_skill_count "$both_home/.codex/skills" 6 "Both target installs Codex core skills"
+expect_skill_count "$both_home/.claude/skills" 5 "Both target installs Claude core skills"
+expect_skill_count "$both_home/.codex/skills" 5 "Both target installs Codex core skills"
 
 tools_home="$TEST_ROOT/tools-home"
 system_bin="$TEST_ROOT/system-python-bin"
@@ -156,7 +156,6 @@ if TEST_PATH="$system_bin:/usr/bin:/bin" run_script "$tools_home" install.sh cla
 else
   fail "Missing optional tools do not fail setup"
 fi
-expect_text "$tools_home/output.log" "WARNING missing agy" "Missing agy is reported"
 expect_text "$tools_home/output.log" "WARNING missing plannotator" "Missing plannotator is reported"
 
 settings_home="$TEST_ROOT/settings-home"

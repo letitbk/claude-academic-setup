@@ -19,7 +19,7 @@ expect_equal() {
 }
 
 expected_skills=$(printf '%s\n' \
-  agy claude codex datacheck hallucinator napkin plain-writing viz | sort)
+  claude codex datacheck hallucinator napkin plain-writing viz | sort)
 actual_skills=$(find "$ROOT/skills" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort)
 expect_equal "skill manifest" "$expected_skills" "$actual_skills"
 
@@ -27,7 +27,7 @@ for path in \
   commands hooks install-optional.sh settings-safe.json \
   presentation_ai_workflow.pdf docs/plans install-research-skills.sh \
   skills/clean-survey-data skills/marginaleffects skills/survey-analysis \
-  skills/qualtrics-survey skills/journal-figures skills/journal-tables; do
+  skills/qualtrics-survey skills/journal-figures skills/journal-tables skills/agy; do
   if [ -e "$ROOT/$path" ]; then
     fail "removed path absent: $path"
   else
@@ -88,8 +88,8 @@ if diff -u <(rg '^## ' "$ROOT/CLAUDE.md") <(rg '^## ' "$ROOT/AGENTS.md") >/dev/n
 else
   fail "instruction headings match"
 fi
-expect_equal "Claude template names its reviewers" "1" "$(rg -c '/codex. or ./agy' "$ROOT/CLAUDE.md")"
-expect_equal "Codex template names its reviewers" "1" "$(rg -c '[$]claude. or .[$]agy' "$ROOT/AGENTS.md")"
+expect_equal "Claude template names its reviewer" "1" "$(rg -c 'different model with ./codex.' "$ROOT/CLAUDE.md")"
+expect_equal "Codex template names its reviewer" "1" "$(rg -c 'different model with .[$]claude.' "$ROOT/AGENTS.md")"
 expect_equal "Claude template names its question tool" "1" "$(rg -c 'AskUserQuestion' "$ROOT/CLAUDE.md")"
 expect_equal "Codex template names its question tool" "1" "$(rg -c 'request_user_input' "$ROOT/AGENTS.md")"
 for template in CLAUDE.md AGENTS.md; do
@@ -129,10 +129,11 @@ else
   fail "test logs are ignored"
 fi
 
-if rg -n 'gemini' "$ROOT/skills/agy/SKILL.md" >/dev/null; then
-  fail "agy skill does not point to an unshipped /gemini skill"
+if rg -n -i 'agy|antigravity' "$ROOT/README.md" "$ROOT/install.sh" "$ROOT/skills" "$ROOT/tests/skill-scenarios.md" \
+  "$ROOT/docs/why-this-setup.md" "$ROOT/docs/models-and-plans.md" >/dev/null; then
+  fail "setup no longer ships or recommends agy"
 else
-  pass "agy skill does not point to an unshipped /gemini skill"
+  pass "setup no longer ships or recommends agy"
 fi
 
 if sed -n '/^COMMON_SKILLS=(/,/^CLAUDE_PLUGINS=(/p' "$ROOT/install.sh" | rg -q hallucinator; then

@@ -55,5 +55,5 @@ When running substantive analysis, not one-liners or sanity checks:
 
 ## 8. Independent Review
 
-- For important plans or results, get a review from a different model with `$claude` or `$agy`.
+- For important plans or results, get a review from a different model with `$claude`. Never run `agy` from an agent; Google blocks the account for it.
 - Present the findings and wait for approval before changing files.

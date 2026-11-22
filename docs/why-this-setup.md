@@ -20,7 +20,6 @@ My answer is to ask an agent from a different company to review the plan, and la
 | You work in | Ask for a review with | It calls |
 |---|---|---|
 | Claude Code | `/codex` | OpenAI Codex CLI |
-| Claude Code or Codex | `/agy` | Google's Antigravity CLI (Gemini models) |
 | Codex | `$claude` | Claude Code CLI |
 
 Each review skill reports its findings and stops. You decide what to fix. In the instruction file, I also ask the agent to get this review for important plans and results.
@@ -55,7 +54,7 @@ My answer is the `napkin` skill. With this skill, the agent keeps a short file, 
 
 A large task can keep an agent busy for many minutes. I do not want to wait, so I work on several projects at once, often with more than one agent in each. That means I need to track which agent works in which folder and branch, and what each one changed.
 
-My answer is [Orca](https://github.com/stablyai/orca), a free, open source desktop app that runs any command line agent. It gives each task its own Git worktree, which is a separate checkout of the repository, so parallel agents do not edit the same files. You can read the project's code, Markdown files, and PDFs next to each agent. Because Claude Code, Codex, and the Antigravity CLI run side by side, it is easy to have one agent review another. If you use only one provider, the Claude or ChatGPT desktop app also manages several projects. The [guide](getting-started.md#work-on-many-projects-at-once) compares the two routes.
+My answer is [Orca](https://github.com/stablyai/orca), a free, open source desktop app that runs any command line agent. It gives each task its own Git worktree, which is a separate checkout of the repository, so parallel agents do not edit the same files. You can read the project's code, Markdown files, and PDFs next to each agent. Because Claude Code and Codex run side by side, it is easy to have one agent review another. If you use only one provider, the Claude or ChatGPT desktop app also manages several projects. The [guide](getting-started.md#work-on-many-projects-at-once) compares the two routes.
 
 ## 7. Agents trust data and figures too quickly
 

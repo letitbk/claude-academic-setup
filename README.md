@@ -9,7 +9,7 @@ The table below lists those problems and what I do about each. The [beginner gui
 | | Problem | What I do |
 |---|---|---|
 | 1 | [Can I trust the agent's work?](docs/why-this-setup.md#1-can-i-trust-the-agents-work) | Make a plan before work starts, review it myself, and check the result against it |
-| 2 | [Did the agent do the work, and does the plan cover everything?](docs/why-this-setup.md#2-did-the-agent-do-the-work-and-does-the-plan-cover-everything) | Ask an agent from another company to review the plan and the output, with `/codex`, `/agy`, or `$claude` |
+| 2 | [Did the agent do the work, and does the plan cover everything?](docs/why-this-setup.md#2-did-the-agent-do-the-work-and-does-the-plan-cover-everything) | Ask an agent from another company to review the plan and the output, with `/codex` or `$claude` |
 | 3 | [How do I write a detailed plan?](docs/why-this-setup.md#3-how-do-i-write-a-detailed-plan) | Say what I want and why, and let the agent ask me questions before it plans |
 | 4 | [Agents write text that is hard to read](docs/why-this-setup.md#4-agents-write-text-that-is-hard-to-read) | The `plain-writing` skill |
 | 5 | [Agents forget what has been done](docs/why-this-setup.md#5-agents-forget-what-has-been-done) | The `napkin` skill, which keeps a short file of lessons in each project |
@@ -23,7 +23,7 @@ The table below lists those problems and what I do about each. The [beginner gui
 
 ## Which models and agents to use
 
-Use your most advanced model to brainstorm and plan, and a cheaper model to carry out the plan. If you can pay for two plans, use agents from two companies, so that one can check the other. I use Claude Max (OPUS 5.5 as my main agent orchestrator, planner, and executor) and Open AI ChatGPT Plus with Codex GPT-6 Astra as a second reviewer (sometimes Gemini 4 Argon as a third reviewer).
+Use your most advanced model to brainstorm and plan, and a cheaper model to carry out the plan. If you can pay for two plans, use agents from two companies, so that one can check the other. I use Claude Max (OPUS 5.5 as my main agent orchestrator, planner, and executor) and Open AI ChatGPT Plus with Codex GPT-6 Astra as a second reviewer.
 
 [Which models and agents to use](docs/models-and-plans.md) compares the plans and has the sign up links.
 
@@ -34,13 +34,13 @@ Use your most advanced model to brainstorm and plan, and a cheaper model to carr
 | Global `CLAUDE.md` or `AGENTS.md` | Independent review (2), asking before guessing (3), evidence that code ran (8), small changes (9), and line breaks (10) | Each agent |
 | Plannotator plugin | Review a plan before work starts (1) | Claude Code |
 | Superpowers plugin | Brainstorming and planning before work starts (1, 3) | Claude Code |
-| `codex`, `agy`, and `claude` skills | Cross model review (2) | `codex` in Claude Code, `claude` in Codex, `agy` in both |
+| `codex` and `claude` skills | Cross model review (2) | `codex` in Claude Code, `claude` in Codex |
 | `plain-writing` skill | Readable prose (4) | Both |
 | `napkin` skill | Memory across sessions and agents (5) | Both |
 | `datacheck` and `viz` skills | Data and figure checks (7) | Both |
 | Starter `settings.json` | Permission prompts, a Bash sandbox, and deny rules for destructive commands | Claude Code |
 
-The installer does not install Claude Code, Codex, the Antigravity CLI, Orca, Planboard, R, or Python packages. You stay in control of those choices.
+The installer does not install Claude Code, Codex, Orca, Planboard, R, or Python packages. You stay in control of those choices.
 
 ### Optional additions
 
@@ -84,4 +84,4 @@ Some skills solve one research problem each, so they live in their own repositor
 
 This repository is MIT licensed. See [LICENSE](LICENSE).
 
-The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Sections 2 to 4 of the instruction files adapt the MIT licensed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) guidelines. Superpowers, Plannotator, Planboard, Codex, the Antigravity CLI, Orca, hallucinator, and Anthropic's document skills are separate projects with their own licenses and terms.
+The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Sections 2 to 4 of the instruction files adapt the MIT licensed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) guidelines. Superpowers, Plannotator, Planboard, Codex, Orca, hallucinator, and Anthropic's document skills are separate projects with their own licenses and terms.

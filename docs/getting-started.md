@@ -42,7 +42,7 @@ Before copying, back up any destination that already exists. For Claude Code:
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
 Copy-Item .\CLAUDE.md "$HOME\.claude\CLAUDE.md"
 Copy-Item .\settings.json "$HOME\.claude\settings.json"
-foreach ($skill in "napkin", "plain-writing", "datacheck", "viz", "agy", "codex") {
+foreach ($skill in "napkin", "plain-writing", "datacheck", "viz", "codex") {
   Copy-Item -Recurse ".\skills\$skill" "$HOME\.claude\skills\$skill"
 }
 claude plugin marketplace add backnotprop/plannotator
@@ -58,7 +58,7 @@ For Codex:
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
 Copy-Item .\AGENTS.md "$HOME\.codex\AGENTS.md"
-foreach ($skill in "napkin", "plain-writing", "datacheck", "viz", "agy", "claude") {
+foreach ($skill in "napkin", "plain-writing", "datacheck", "viz", "claude") {
   Copy-Item -Recurse ".\skills\$skill" "$HOME\.codex\skills\$skill"
 }
 ```
@@ -81,12 +81,12 @@ The script checks prerequisites before writing. It then installs:
 
 | Target | Instructions | Skills | Other configuration |
 |---|---|---|---|
-| Claude | `~/.claude/CLAUDE.md` | Five shared skills plus `codex` | Minimal settings and two user plugins |
-| Codex | `~/.codex/AGENTS.md` | Five shared skills plus `claude` | No Claude settings or plugins |
+| Claude | `~/.claude/CLAUDE.md` | Four shared skills plus `codex` | Minimal settings and two user plugins |
+| Codex | `~/.codex/AGENTS.md` | Four shared skills plus `claude` | No Claude settings or plugins |
 
-The shared skills are `napkin`, `plain-writing`, `datacheck`, `viz`, and `agy`. The `codex` skill lets Claude ask Codex for a review, and the `claude` skill lets Codex ask Claude.
+The shared skills are `napkin`, `plain-writing`, `datacheck`, and `viz`. The `codex` skill lets Claude ask Codex for a review, and the `claude` skill lets Codex ask Claude.
 
-The installer then checks for the programs that the review skills and plugins call: `agy`, `plannotator`, and the other agent's command line tool. If one is missing, the summary prints a warning and the command to install it. Setup still succeeds.
+The installer then checks for the programs that the review skills and plugins call: `plannotator` and the other agent's command line tool. If one is missing, the summary prints a warning and the command to install it. Setup still succeeds.
 
 ### Where Codex looks for skills
 
@@ -219,7 +219,6 @@ A skill is a small instruction package for a recurring kind of task. Skills can 
 | `plain-writing` | Write clear prose with simple words and little filler | Both |
 | `datacheck` | Inspect a new data file before analysis | Both |
 | `viz` | Plan, create, and check a data visualization | Both |
-| `agy` | Ask Gemini, through the Antigravity CLI, for an independent review | Both |
 | `codex` | Ask Codex for an independent review from inside Claude Code | Claude Code |
 | `claude` | Ask Claude for an independent review from inside Codex | Codex |
 
@@ -427,20 +426,11 @@ A worktree separates files, not processes. An agent in a worktree can still run 
 
 With several agents open, it is easy to ask a second model to review a plan or a result before you accept it. A model from another company does not share the first model's reasoning, so it often catches different mistakes.
 
-- In Claude Code, run `/codex` for a Codex review or `/agy` for a Gemini review.
-- In Codex, run `$claude` for a Claude review or `$agy` for a Gemini review.
+- In Claude Code, run `/codex` for a Codex review.
+- In Codex, run `$claude` for a Claude review.
 
 Each review skill reports its findings and stops. You choose which findings to act on. OpenAI also publishes an official [Codex plugin for Claude Code](https://github.com/openai/codex-plugin-cc) with `/codex:review` and `/codex:adversarial-review` commands, if you prefer a plugin to a skill.
 
-The `agy` skill starts the Antigravity CLI with `--dangerously-skip-permissions`. The Antigravity CLI cannot show a permission prompt when it runs from a script, so without the flag it stops at its first command. This is the one place in the setup that skips permission prompts. The review prompt asks only for text, but the flag does not enforce that. Commit or stash your work before a review, so that `git status` shows any change the reviewer makes.
-
-Install the Antigravity CLI from [Google's instructions](https://antigravity.google/docs/getting-started?tab=cli). On macOS and Linux:
-
-```bash
-curl -fsSL https://antigravity.google/cli/install.sh | bash
-```
-
-Google stopped serving Gemini CLI for personal Google accounts on June 18, 2026 and points users to the Antigravity products, so this setup uses `agy` rather than Gemini CLI.
 
 ## Updating from an older version of this repository
 
@@ -457,6 +447,8 @@ Use Claude's `/plugin` screen to disable an old plugin before uninstalling it. M
 
 Earlier versions of this repository installed Claude HUD, the GitHub plugin, and Planboard by default, and included a research skill bundle with survey, marginal effects, Qualtrics, and journal formatting skills. Planboard is now optional. The Qualtrics and journal skills moved to their own repositories. Your existing copies keep working until you remove them.
 
+Earlier versions also installed an `agy` skill for Gemini reviews. Google now blocks accounts that run its Antigravity CLI from another agent, so delete `~/.claude/skills/agy` and `~/.codex/skills/agy` if you have them.
+
 ## Troubleshooting
 
 | Problem | Check |
@@ -464,7 +456,6 @@ Earlier versions of this repository installed Claude HUD, the GitHub plugin, and
 | `claude` or `codex` is not found | Reopen the terminal, then run the official installer again |
 | Installer stops before writing | Confirm the selected CLI and `python3` are on `PATH` |
 | A plugin fails | Run the exact retry command printed by the installer |
-| The summary warns that `agy` is missing | Install the Antigravity CLI, then run `agy` once to sign in |
 | The summary warns that `plannotator` is missing | Run `curl -fsSL https://plannotator.ai/install.sh \| bash` |
 | A skill appears twice in Codex | Keep it in only one of `~/.codex/skills` and `~/.agents/skills` |
 | Sandbox unavailable | Use WSL on Windows, or follow the Claude sandbox troubleshooting guide |
@@ -493,8 +484,6 @@ git status
 - [Codex models](https://developers.openai.com/codex/models)
 - [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md/)
 - [Codex skills](https://learn.chatgpt.com/docs/build-skills)
-- [Antigravity CLI](https://antigravity.google/docs/getting-started?tab=cli)
-- [Antigravity plans](https://antigravity.google/docs/plans)
 - [Plannotator](https://github.com/backnotprop/plannotator)
 - [Planboard](https://github.com/letitbk/planboard)
 - [Orca](https://github.com/stablyai/orca)

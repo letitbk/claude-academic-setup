@@ -9,7 +9,6 @@ Use these prompts when manually testing the bundled skills in Claude Code or Cod
 | `datacheck` | “I just received `survey.csv`. Inspect it before we begin analysis.” | Profiles structure, missingness, duplicates, ranges, labels, and join keys before modeling. |
 | `viz` | “Plot the distribution of age by treatment group and save a publication-ready figure.” | Clarifies the comparison, chooses an appropriate chart, renders it, and checks the output visually. |
 | `codex` | “Ask Codex to review my uncommitted changes for correctness.” | Runs a read-only Codex review and reports findings without applying them. |
-| `agy` | “Get a Gemini second opinion on this plan with agy.” | Runs one `agy -p` review, reports findings, and stops without applying them. |
 | `claude` | In Codex: “Ask Claude to critique this implementation plan.” | Runs a read-only Claude review and reports findings without applying them. |
 | `hallucinator` (optional) | “Check whether the references in `refs.bib` are real.” | Runs `hallucinator-cli check` with a log in `logs/`, lists not found and retracted references first, and treats not found as a reason to check by hand. |
 

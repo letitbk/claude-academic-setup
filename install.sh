@@ -10,7 +10,6 @@ COMMON_SKILLS=(
   "plain-writing"
   "datacheck"
   "viz"
-  "agy"
 )
 
 CLAUDE_SKILLS=(
@@ -70,7 +69,6 @@ if target_includes codex "$TARGET"; then
   done
 fi
 
-check_tool agy "/agy reviews" "curl -fsSL https://antigravity.google/cli/install.sh | bash"
 if target_includes claude "$TARGET"; then
   check_tool plannotator "Plannotator plugin" "curl -fsSL https://plannotator.ai/install.sh | bash"
   check_tool codex "/codex reviews" "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
