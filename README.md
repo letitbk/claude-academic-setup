@@ -1,5 +1,7 @@
 # Claude Code and Codex for academic researchers
 
+![views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fletitbk%2F0b43bc14ffc81fd521691ea369ad9025%2Fraw%2Ftraffic.json&query=%24%5B%27claude-academic-setup%27%5D.views&label=views) ![clones](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fletitbk%2F0b43bc14ffc81fd521691ea369ad9025%2Fraw%2Ftraffic.json&query=%24%5B%27claude-academic-setup%27%5D.clones&label=clones)
+
 This repository is the setup I use to do research with coding agents. It works with Claude Code, Codex, or both. It adds instruction files and skills, plus two plugins for Claude Code. Each part addresses a problem that keeps people, including me, from using and trusting these agents.
 
 The table below lists those problems and what I do about each. The [beginner guide](docs/getting-started.md) has the step by step instructions.
@@ -85,17 +87,3 @@ Some skills solve one research problem each, so they live in their own repositor
 This repository is MIT licensed. See [LICENSE](LICENSE).
 
 The bundled `napkin` and `plain-writing` skills keep their upstream licenses and attribution. Sections 2 to 4 of the instruction files adapt the MIT licensed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) guidelines. Superpowers, Plannotator, Planboard, Codex, Orca, hallucinator, and Anthropic's document skills are separate projects with their own licenses and terms.
-
-## How many people use this setup
-
-GitHub keeps traffic counts for only 14 days, so a weekly GitHub Action saves them in [.github/traffic](.github/traffic) and updates the table below. The unique column adds up GitHub's daily counts of unique visitors and cloners, so a person who comes back on another day counts again.
-
-<!-- traffic:start -->
-Counts from 2026-11-08 to 2026-11-21:
-
-| | Total | Unique |
-|---|---|---|
-| Views | 106 | 57 |
-| Clones | 84 | 49 |
-
-<!-- traffic:end -->

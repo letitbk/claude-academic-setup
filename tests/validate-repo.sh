@@ -136,14 +136,6 @@ else
   pass "setup no longer ships or recommends agy"
 fi
 
-if python3 -m py_compile "$ROOT/.github/scripts/traffic.py" 2>/dev/null; then
-  pass "traffic script compiles"
-else
-  fail "traffic script compiles"
-fi
-expect_equal "README has one traffic block" "1 1" \
-  "$(rg -c '^<!-- traffic:start -->$' "$ROOT/README.md") $(rg -c '^<!-- traffic:end -->$' "$ROOT/README.md")"
-
 if sed -n '/^COMMON_SKILLS=(/,/^CLAUDE_PLUGINS=(/p' "$ROOT/install.sh" | rg -q hallucinator; then
   fail "hallucinator stays optional"
 else
